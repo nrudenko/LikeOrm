@@ -1,0 +1,12 @@
+bin/*
+gen/*
+.settings/*
+
+.idea/
+*.iml
+out/
+.directory
+build/
+.gradle/
+local.properties
+
