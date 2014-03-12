@@ -17,18 +17,20 @@ public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        List<Scheme> schemas = new ArrayList<Scheme>();
-        appendSchemas(schemas);
+        List<Class<? extends OrmModel>> classes = new ArrayList<Class<? extends OrmModel>>();
+        appendSchemas(classes);
         StringBuilder sql = new StringBuilder();
-        for (int i = 0; i < schemas.size(); i++) {
-            Scheme scheme = schemas.get(i);
+        for (int i = 0; i < classes.size(); i++) {
+            Scheme scheme = new Scheme(classes.get(i));
             appendCreateTableSQL(sql, scheme);
+            db.execSQL(sql.toString());
+            sql.setLength(0);
         }
-        db.execSQL(sql.toString());
-        sql.setLength(0);
     }
+
     protected abstract String getAuthority();
-    protected abstract void appendSchemas(List<Scheme> schemes);
+
+    protected abstract void appendSchemas(List<Class<? extends OrmModel>> classes);
 
     protected boolean appendCreateTableSQL(StringBuilder sql, Scheme scheme) {
         sql.append("CREATE TABLE IF NOT EXISTS ").append(scheme.getTableName()).append(" (");
@@ -43,8 +45,8 @@ public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
             }
             columnsSql.append(column.getColumnName());
             columnsSql
-                    .append(" ")
-                    .append(column.getColumnType());
+                .append(" ")
+                .append(column.getColumnType());
         }
 
         if (columnsSql.length() > 0) {
@@ -57,7 +59,7 @@ public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
         if (customSql != null && customSql.length() > 0) {
             sql.append(customSql);
         }
-        sql.append(")");
+        sql.append(");");
         Log.d("ss", sql.toString());
         return false;
     }

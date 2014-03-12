@@ -1,4 +1,4 @@
-package com.githab.nrudenko.orm.example.model;
+package com.github.nrudenko.orm.example.model;
 
 import java.util.Date;
 

@@ -1,4 +1,4 @@
-package com.githab.nrudenko.orm.example;
+package com.github.nrudenko.orm.example;
 
 import android.content.ContentProvider;
 import android.content.ContentValues;

@@ -1,10 +1,11 @@
-package com.githab.nrudenko.orm.example;
+package com.github.nrudenko.orm.example;
 
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
-import com.githab.nrudenko.orm.example.model.ExampleModel;
+import com.githab.nrudenko.orm.example.R;
+import com.github.nrudenko.orm.example.model.ExampleModel;
 import com.github.nrudenko.orm.OrmUri;
 
 import java.util.Date;
@@ -15,6 +16,11 @@ public class MainActivity extends ActionBarActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+        insert();
+        update();
+    }
+
+    private void insert() {
         ExampleModel exampleModel = new ExampleModel();
         exampleModel.setDate(new Date());
         exampleModel.setText("text");
@@ -22,6 +28,8 @@ public class MainActivity extends ActionBarActivity {
         getContentResolver().insert(OrmUri.get(ExampleModel.class), exampleModel.toContentValues());
     }
 
+    private void update() {
+    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {

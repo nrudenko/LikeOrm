@@ -1,10 +1,13 @@
-package com.githab.nrudenko.orm.example;
+package com.github.nrudenko.orm.example;
 
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
-import com.githab.nrudenko.orm.example.model.ExampleModel;
+import com.github.nrudenko.orm.OrmModel;
+import com.github.nrudenko.orm.example.model.Attach;
+import com.github.nrudenko.orm.example.model.ExampleModel;
 import com.github.nrudenko.orm.BaseSQLiteOpenHelper;
 import com.github.nrudenko.orm.Scheme;
+import com.github.nrudenko.orm.example.model.Message;
 
 import java.util.List;
 
@@ -36,8 +39,10 @@ public class DatabaseHelper extends BaseSQLiteOpenHelper {
     }
 
     @Override
-    protected void appendSchemas(List<Scheme> schemes) {
-        schemes.add(new Scheme(ExampleModel.class));
+    protected void appendSchemas(List<Class<? extends OrmModel>> classes) {
+        classes.add(Message.class);
+        classes.add(ExampleModel.class);
+        classes.add(Attach.class);
     }
 
     @Override
