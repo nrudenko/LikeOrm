@@ -1,7 +1,7 @@
 package com.github.nrudenko.orm;
 
 public enum DBType {
-    INT_PRIMARY("INTEGER"),
+    INT_PRIMARY("INTEGER PRIMARY KEY AUTOINCREMENT"),
     INT("INTEGER DEFAULT 0"),
     INT_DEF_NEGATIVE("INTEGER DEFAULT -1"),
     FLOAT("FLOAT DEFAULT 0"),

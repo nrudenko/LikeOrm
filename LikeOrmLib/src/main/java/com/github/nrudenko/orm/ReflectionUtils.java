@@ -156,8 +156,8 @@ public class ReflectionUtils {
             String customAdditional = null;
 
             if (dbColumn != null) {
-                columnName = dbColumn.name();
-                type = dbColumn.type().getName();
+                columnName = dbColumn.columnName();
+                type = dbColumn.columnType().getName();
                 customAdditional = dbColumn.additional();
             }
 

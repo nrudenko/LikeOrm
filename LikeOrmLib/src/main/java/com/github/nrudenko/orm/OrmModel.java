@@ -6,7 +6,7 @@ import com.github.nrudenko.orm.annotation.*;
 
 public class OrmModel {
 
-    @DbColumn(additional = DbConstants.PRIMARY_AUTOINCREMENT, type = DBType.INT)
+    @DbColumn(columnType = DBType.INT_PRIMARY)
     public long _id;
 
     public ContentValues toContentValues() {

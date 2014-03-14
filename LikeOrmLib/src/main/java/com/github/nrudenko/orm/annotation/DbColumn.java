@@ -11,9 +11,9 @@ import java.lang.annotation.Target;
 @Retention(RetentionPolicy.RUNTIME)
 public @interface DbColumn {
 
-    public String name() default "";
+    public String columnName() default "";
 
-    public DBType type() default DBType.TEXT;
+    public DBType columnType() default DBType.TEXT;
 
     public String additional() default "";
 }
