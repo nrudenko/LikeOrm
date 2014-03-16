@@ -5,7 +5,10 @@ import android.database.Cursor;
 import android.database.DatabaseUtils;
 import android.text.TextUtils;
 import com.github.nrudenko.orm.annotation.DbColumn;
-import com.github.nrudenko.orm.annotation.SkipFieldInDb;
+import com.github.nrudenko.orm.annotation.DbSkipField;
+import com.github.nrudenko.orm.commons.Column;
+import com.github.nrudenko.orm.commons.DBType;
+import com.github.nrudenko.orm.commons.FieldType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -35,10 +38,10 @@ public class ReflectionUtils {
         for (Field field : classFields) {
             String fieldName = field.getName();
             try {
-                if (field.isAnnotationPresent(SkipFieldInDb.class)) {
+                if (field.isAnnotationPresent(DbSkipField.class)) {
                     continue;
                 }
-                FieldType key = FieldType.byType(field.getType());
+                FieldType key = FieldType.byTypeClass(field.getType());
                 field.setAccessible(true);
                 Object value = field.get(model);
                 if (key != null && value != null) {
@@ -94,11 +97,11 @@ public class ReflectionUtils {
         for (Field field : fields) {
             String fieldName = field.getName();
             try {
-                if (field.isAnnotationPresent(SkipFieldInDb.class)) {
+                if (field.isAnnotationPresent(DbSkipField.class)) {
                     continue;
                 }
                 Class<?> type = field.getType();
-                FieldType fieldType = FieldType.byType(type);
+                FieldType fieldType = FieldType.byTypeClass(type);
                 field.setAccessible(true);
                 if (fieldType != null) {
                     switch (fieldType) {
@@ -148,7 +151,7 @@ public class ReflectionUtils {
     }
 
     public static Column fieldToColumn(Field field) {
-        if (!field.isAnnotationPresent(SkipFieldInDb.class)) {
+        if (!field.isAnnotationPresent(DbSkipField.class)) {
             DbColumn dbColumn = field.getAnnotation(DbColumn.class);
 
             String columnName = null;
@@ -156,8 +159,8 @@ public class ReflectionUtils {
             String customAdditional = null;
 
             if (dbColumn != null) {
-                columnName = dbColumn.columnName();
-                type = dbColumn.columnType().getName();
+                columnName = dbColumn.name();
+                type = dbColumn.type().getName();
                 customAdditional = dbColumn.additional();
             }
 
@@ -166,7 +169,7 @@ public class ReflectionUtils {
             }
 
             if (TextUtils.isEmpty(type)) {
-                FieldType key = FieldType.byType(field.getType());
+                FieldType key = FieldType.byTypeClass(field.getType());
                 if (key != null) {
                     DBType dbType = getDbType(key);
                     type = dbType.getName();

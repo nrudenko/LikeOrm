@@ -1,5 +1,7 @@
 package com.github.nrudenko.orm;
 
+import com.github.nrudenko.orm.commons.Column;
+
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 

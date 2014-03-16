@@ -1,12 +1,16 @@
 package com.github.nrudenko.orm.example;
 
+import android.database.DatabaseUtils;
 import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
 import android.view.Menu;
 import android.view.MenuItem;
 import com.githab.nrudenko.orm.example.R;
+import com.github.nrudenko.orm.example.model.Attach;
 import com.github.nrudenko.orm.example.model.ExampleModel;
 import com.github.nrudenko.orm.OrmUri;
+import com.github.nrudenko.orm.example.model.schema.AttachSchema;
+import com.github.nrudenko.orm.example.model.schema.ExampleModelSchema;
 
 import java.util.Date;
 
@@ -29,6 +33,12 @@ public class MainActivity extends ActionBarActivity {
     }
 
     private void update() {
+        Attach attach = new Attach();
+        attach.setUrl("url");
+//        new Update(Attach.class)
+//            .with(attach)
+//            .where(AttachSchema.MESSAGE_ID)
+//            .is(3);
     }
 
     @Override

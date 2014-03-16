@@ -4,6 +4,7 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
 import android.util.Log;
+import com.github.nrudenko.orm.commons.Column;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -43,10 +44,10 @@ public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
             if (columnsSql.length() > 0) {
                 columnsSql.append(",");
             }
-            columnsSql.append(column.getColumnName());
+            columnsSql.append(column.getName());
             columnsSql
                 .append(" ")
-                .append(column.getColumnType());
+                .append(column.getType());
         }
 
         if (columnsSql.length() > 0) {

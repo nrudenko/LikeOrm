@@ -6,7 +6,6 @@ import com.github.nrudenko.orm.OrmModel;
 import com.github.nrudenko.orm.example.model.Attach;
 import com.github.nrudenko.orm.example.model.ExampleModel;
 import com.github.nrudenko.orm.BaseSQLiteOpenHelper;
-import com.github.nrudenko.orm.Scheme;
 import com.github.nrudenko.orm.example.model.Message;
 
 import java.util.List;
