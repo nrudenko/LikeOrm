@@ -9,7 +9,8 @@ public enum DBType {
 	NUMERIC("NUMERIC"), 
 	TEXT_NOT_NULL("TEXT NOT NULL"),
     TEXT_DEFAULT_EMPTY("TEXT DEFAULT \"\""),
-    BLOB("BLOB");
+    BLOB("BLOB"),
+    NO_TYPE(""); // just for default annotation value
 
 	private String name;
 
@@ -18,6 +19,6 @@ public enum DBType {
 	}
 
 	public String getName() {
-		return toString();
+		return name;
 	}
 }

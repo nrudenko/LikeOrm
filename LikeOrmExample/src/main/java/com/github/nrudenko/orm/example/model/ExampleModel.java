@@ -1,7 +1,10 @@
 package com.github.nrudenko.orm.example.model;
 
+import com.github.nrudenko.orm.annotation.Table;
+
 import java.util.Date;
 
+@Table
 public class ExampleModel extends BaseModel {
 
     String text;

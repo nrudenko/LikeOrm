@@ -1,19 +1,26 @@
 package com.github.nrudenko.orm;
 
+import com.github.nrudenko.orm.annotation.Table;
 import com.github.nrudenko.orm.commons.Column;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class Scheme {
-    Class<? extends OrmModel> modelClass;
+    final Table table;
+    final Class<?> modelClass;
 
-    public Scheme(Class<? extends OrmModel> modelClass) {
+    public Scheme(Class modelClass) throws ClassCastException, IllegalArgumentException{
         this.modelClass = modelClass;
+        this.table = (Table) modelClass.getAnnotation(Table.class);
+        if (table == null) {
+            throw new IllegalArgumentException("Scheme candidate class must use Table annotation");
+        }
     }
 
     public String getTableName() {
-        return modelClass.getSimpleName();
+        final String name = modelClass.getAnnotation(Table.class).name();
+        return name.isEmpty() ? modelClass.getSimpleName() : name;
     }
 
     public ArrayList<Column> getColumns() {
@@ -30,6 +37,6 @@ public class Scheme {
     }
 
     public String getCustomSql() {
-        return null;
+        return modelClass.getAnnotation(Table.class).customSql();
     }
 }

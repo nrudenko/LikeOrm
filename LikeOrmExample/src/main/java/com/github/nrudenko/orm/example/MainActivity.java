@@ -1,16 +1,15 @@
 package com.github.nrudenko.orm.example;
 
-import android.database.DatabaseUtils;
-import android.support.v7.app.ActionBarActivity;
 import android.os.Bundle;
+import android.support.v7.app.ActionBarActivity;
 import android.view.Menu;
 import android.view.MenuItem;
+
 import com.githab.nrudenko.orm.example.R;
+import com.github.nrudenko.orm.CursorUtil;
+import com.github.nrudenko.orm.OrmUri;
 import com.github.nrudenko.orm.example.model.Attach;
 import com.github.nrudenko.orm.example.model.ExampleModel;
-import com.github.nrudenko.orm.OrmUri;
-import com.github.nrudenko.orm.example.model.schema.AttachSchema;
-import com.github.nrudenko.orm.example.model.schema.ExampleModelSchema;
 
 import java.util.Date;
 
@@ -29,7 +28,7 @@ public class MainActivity extends ActionBarActivity {
         exampleModel.setDate(new Date());
         exampleModel.setText("text");
         exampleModel.setIntVal(1);
-        getContentResolver().insert(OrmUri.get(ExampleModel.class), exampleModel.toContentValues());
+        getContentResolver().insert(OrmUri.get(ExampleModel.class), CursorUtil.objectToContentValues(exampleModel));
     }
 
     private void update() {

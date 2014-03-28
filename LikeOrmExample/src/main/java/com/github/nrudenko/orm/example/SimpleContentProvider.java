@@ -5,6 +5,9 @@ import android.content.ContentValues;
 import android.database.Cursor;
 import android.net.Uri;
 
+/**
+ * Stub
+ */
 public class SimpleContentProvider extends ContentProvider {
     private DatabaseHelper db;
 

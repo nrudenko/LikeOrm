@@ -3,7 +3,9 @@ package com.github.nrudenko.orm;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 import android.database.sqlite.SQLiteOpenHelper;
+import android.text.TextUtils;
 import android.util.Log;
+
 import com.github.nrudenko.orm.commons.Column;
 
 import java.util.ArrayList;
@@ -11,6 +13,9 @@ import java.util.Iterator;
 import java.util.List;
 
 public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
+
+    public static final String TAG = "LikeOrmOpenHelper";
+
     public BaseSQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
         OrmUri.getInstance(context);
@@ -18,7 +23,7 @@ public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
-        List<Class<? extends OrmModel>> classes = new ArrayList<Class<? extends OrmModel>>();
+        List<Class> classes = new ArrayList<Class>();
         appendSchemas(classes);
         StringBuilder sql = new StringBuilder();
         for (int i = 0; i < classes.size(); i++) {
@@ -29,9 +34,7 @@ public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
         }
     }
 
-    protected abstract String getAuthority();
-
-    protected abstract void appendSchemas(List<Class<? extends OrmModel>> classes);
+    protected abstract void appendSchemas(List<Class> classes);
 
     protected boolean appendCreateTableSQL(StringBuilder sql, Scheme scheme) {
         sql.append("CREATE TABLE IF NOT EXISTS ").append(scheme.getTableName()).append(" (");
@@ -57,11 +60,13 @@ public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
         }
 
         String customSql = scheme.getCustomSql();
-        if (customSql != null && customSql.length() > 0) {
-            sql.append(customSql);
+        if (!TextUtils.isEmpty(customSql)) {
+            sql
+                .append(" ")
+                .append(customSql);
         }
         sql.append(");");
-        Log.d("ss", sql.toString());
+        Log.d(TAG, sql.toString());
         return false;
     }
 

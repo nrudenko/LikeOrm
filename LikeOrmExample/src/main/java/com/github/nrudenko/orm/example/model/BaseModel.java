@@ -1,7 +1,10 @@
 package com.github.nrudenko.orm.example.model;
 
-import com.github.nrudenko.orm.OrmModel;
+import com.github.nrudenko.orm.annotation.DbColumn;
+import com.github.nrudenko.orm.commons.DBType;
 
-public class BaseModel extends OrmModel {
-    public String id;
+public abstract class BaseModel {
+
+    @DbColumn(type = DBType.INT_PRIMARY)
+    protected long _id;
 }
