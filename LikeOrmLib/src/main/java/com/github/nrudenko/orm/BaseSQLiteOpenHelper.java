@@ -29,8 +29,6 @@ public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
         }
     }
 
-    protected abstract String getAuthority();
-
     protected abstract void appendSchemas(List<Class<? extends OrmModel>> classes);
 
     protected boolean appendCreateTableSQL(StringBuilder sql, Scheme scheme) {
