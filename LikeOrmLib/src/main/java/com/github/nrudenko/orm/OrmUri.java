@@ -19,7 +19,7 @@ public class OrmUri {
         return instance;
     }
 
-    public static Uri get(Class<? extends OrmModel> modelClass) {
+    public static Uri get(Class<?> modelClass) {
         Uri contentUri = BASE_URI.buildUpon()
                 .appendPath("model")
                 .appendPath(new Scheme(modelClass).getTableName())

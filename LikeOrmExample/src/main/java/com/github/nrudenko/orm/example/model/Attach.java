@@ -1,5 +1,8 @@
 package com.github.nrudenko.orm.example.model;
 
+import com.github.nrudenko.orm.annotation.Table;
+
+@Table
 public class Attach extends BaseModel {
 
     String url;
