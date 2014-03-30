@@ -4,14 +4,15 @@ import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
 import android.content.pm.PackageManager;
+import android.content.pm.ProviderInfo;
 import android.os.Bundle;
 
-public class OrmMetaData {
+public class MetaDataParser {
 
     static <T> T getMetaData(Context context, String name) {
         try {
             ApplicationInfo info = context.getPackageManager().getApplicationInfo(context.getPackageName(),
-                    PackageManager.GET_META_DATA);
+                PackageManager.GET_META_DATA);
             Bundle metaData = info.metaData;
             if (metaData != null)
                 return (T) metaData.get(name);
@@ -32,12 +33,18 @@ public class OrmMetaData {
         return "";
     }
 
-    public static String getAuthority(Context context) {
+    public static String getAuthority(Context context, Class<? extends LikeOrmContentProvider> providerClass) {
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
-                    PackageManager.GET_PROVIDERS);
-            if (packageInfo.providers.length > 0) {
-                return packageInfo.providers[0].authority;
+                PackageManager.GET_PROVIDERS);
+            ProviderInfo[] providers = packageInfo.providers;
+            if (providers.length > 0) {
+                for (int i = 0; i < providers.length; i++) {
+                    ProviderInfo provider = providers[i];
+                    if (provider.name.contains(providerClass.getSimpleName())) {
+                        return provider.authority;
+                    }
+                }
             }
         } catch (PackageManager.NameNotFoundException e) {
             e.printStackTrace();

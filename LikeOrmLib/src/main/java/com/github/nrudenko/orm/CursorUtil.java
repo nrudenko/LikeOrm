@@ -16,7 +16,7 @@ public class CursorUtil {
     private CursorUtil() {
     }
 
-    public static void cursorToObject(Cursor cursor, Object model) {
+    public static <T> T cursorToObject(Cursor cursor, T model) {
         ContentValues contentValues = new ContentValues();
         DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
         ArrayList<Field> fields = ReflectionUtils.getClassFields(model.getClass());
@@ -87,6 +87,7 @@ public class CursorUtil {
                 //TODO handle errors
             }
         }
+        return model;
     }
 
     public static ContentValues objectToContentValues(Object model) {
