@@ -33,7 +33,7 @@ public enum FieldType {
     }
 
     public String getDbTypeReference() {
-        return DbType.class.getSimpleName() + "." + dbType.getSqlRep();
+        return DbType.class.getSimpleName() + "." + dbType.toString();
     }
 
     public static FieldType byTypeClass(Class cls) {
@@ -59,9 +59,9 @@ public enum FieldType {
         return null;
     }
 
-    static FieldTypeClassPredicate classNamePredicate = new FieldTypeClassPredicate() {
+    static FieldTypeClassPredicate<String> classNamePredicate = new FieldTypeClassPredicate<String>() {
         @Override
-        public boolean isConditionEquals(Class cls, Object condition) {
+        public boolean isConditionEquals(Class cls, String condition) {
             if (condition.equals(cls.getSimpleName())) {
                 return true;
             }
@@ -69,17 +69,17 @@ public enum FieldType {
         }
     };
 
-    static FieldTypeClassPredicate classPredicate = new FieldTypeClassPredicate() {
+    static FieldTypeClassPredicate<Class> classPredicate = new FieldTypeClassPredicate<Class>() {
         @Override
-        public boolean isConditionEquals(Class cls, Object condition) {
-            if (cls.isAssignableFrom((Class) condition)) {
+        public boolean isConditionEquals(Class cls, Class condition) {
+            if (cls.isAssignableFrom(condition)) {
                 return true;
             }
             return false;
         }
     };
 
-    interface FieldTypeClassPredicate {
-        boolean isConditionEquals(Class cls, Object condition);
+    interface FieldTypeClassPredicate<T> {
+        boolean isConditionEquals(Class cls, T condition);
     }
 }
