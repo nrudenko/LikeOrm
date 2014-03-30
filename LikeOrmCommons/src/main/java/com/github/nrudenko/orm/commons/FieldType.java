@@ -4,21 +4,22 @@ package com.github.nrudenko.orm.commons;
 import java.util.Date;
 
 public enum FieldType {
-    INTEGER(DBType.INT, Integer.class, int.class),
-    STRING(DBType.TEXT, String.class),
-    BOOLEAN(DBType.INT, boolean.class),
-    LONG(DBType.NUMERIC, long.class),
-    BYTE(DBType.INT, byte.class),
-    SHORT(DBType.INT, short.class),
-    FLOAT(DBType.REAL, float.class),
-    DOUBLE(DBType.REAL, double.class),
-    BLOB(DBType.BLOB, byte[].class),
-    DATE(DBType.NUMERIC, Date.class);
+    INTEGER(DbType.INT, Integer.class, int.class),
+    STRING(DbType.TEXT, String.class),
+    BOOLEAN(DbType.INT, boolean.class),
+    LONG(DbType.NUMERIC, long.class),
+    BYTE(DbType.INT, byte.class),
+    SHORT(DbType.INT, short.class),
+    FLOAT(DbType.REAL, float.class),
+    DOUBLE(DbType.REAL, double.class),
+    BLOB(DbType.BLOB, byte[].class),
+    DATE(DbType.NUMERIC, Date.class),
+    ENUM(DbType.TEXT, Enum.class);
 
     private final Class[] cls;
-    private final DBType dbType;
+    private final DbType dbType;
 
-    private FieldType(DBType dbType, Class... cls) {
+    private FieldType(DbType dbType, Class... cls) {
         this.dbType = dbType;
         this.cls = cls;
     }
@@ -27,12 +28,12 @@ public enum FieldType {
         return cls;
     }
 
-    public DBType getDbType() {
+    public DbType getDbType() {
         return dbType;
     }
 
     public String getDbTypeReference() {
-        return DBType.class.getSimpleName() + "." + dbType.getName();
+        return DbType.class.getSimpleName() + "." + dbType.getSqlRep();
     }
 
     public static FieldType byTypeClass(Class cls) {
@@ -71,7 +72,7 @@ public enum FieldType {
     static FieldTypeClassPredicate classPredicate = new FieldTypeClassPredicate() {
         @Override
         public boolean isConditionEquals(Class cls, Object condition) {
-            if (condition.equals(cls)) {
+            if (cls.isAssignableFrom((Class) condition)) {
                 return true;
             }
             return false;

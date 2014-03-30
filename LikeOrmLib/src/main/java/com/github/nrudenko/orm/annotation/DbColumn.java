@@ -1,6 +1,6 @@
 package com.github.nrudenko.orm.annotation;
 
-import com.github.nrudenko.orm.commons.DBType;
+import com.github.nrudenko.orm.commons.DbType;
 
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -13,7 +13,7 @@ public @interface DbColumn {
 
     public String name() default "";
 
-    public DBType type() default DBType.NO_TYPE;
+    public DbType type() default DbType.NO_TYPE;
 
     public String additional() default "";
 }

@@ -65,14 +65,26 @@ public class CursorUtil {
                                 field.set(model, new Date(timeMs));
                             }
                             break;
+                        case ENUM:
+                            String value = contentValues.getAsString(fieldName);
+                            try {
+                                Field enumField = field.getType().getField(value);
+                                field.set(model, enumField.get(model));
+                            } catch (NoSuchFieldException e) {
+                                e.printStackTrace();
+                                //TODO handle errors
+                            }
+                            break;
                         default:
                             break;
                     }
                 }
             } catch (IllegalArgumentException e) {
                 e.printStackTrace();
+                //TODO handle errors
             } catch (IllegalAccessException e) {
                 e.printStackTrace();
+                //TODO handle errors
             }
         }
     }
@@ -120,6 +132,9 @@ public class CursorUtil {
                             break;
                         case DATE:
                             contentValues.put(fieldName, ((Date) value).getTime());
+                            break;
+                        case ENUM:
+                            contentValues.put(fieldName, value.toString());
                             break;
                         default:
                             break;

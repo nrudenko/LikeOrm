@@ -1,6 +1,6 @@
 package com.github.nrudenko.orm.commons;
 
-public enum DBType {
+public enum DbType {
 	INT_PRIMARY("INTEGER PRIMARY KEY AUTOINCREMENT"),
 	INT("INTEGER DEFAULT 0"),
 	INT_DEF("INTEGER DEFAULT -1"),
@@ -12,13 +12,13 @@ public enum DBType {
     BLOB("BLOB"),
     NO_TYPE(""); // just for default annotation value
 
-	private String name;
+	private String sqlRepresentation;
 
-	DBType(String name) {
-		this.name = name;
+	DbType(String value) {
+		this.sqlRepresentation = value;
 	}
 
-	public String getName() {
-		return name;
+	public String getSqlRep() {
+		return sqlRepresentation;
 	}
 }

@@ -5,12 +5,13 @@ import android.text.TextUtils;
 import com.github.nrudenko.orm.annotation.DbColumn;
 import com.github.nrudenko.orm.annotation.DbSkipField;
 import com.github.nrudenko.orm.commons.Column;
-import com.github.nrudenko.orm.commons.DBType;
+import com.github.nrudenko.orm.commons.DbType;
 import com.github.nrudenko.orm.commons.FieldType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashMap;
 
 public class ReflectionUtils {
 
@@ -29,20 +30,25 @@ public class ReflectionUtils {
         return fields;
     }
 
+    /**
+     * Convert java field to Column
+     *
+     * @param field
+     * @return Column or null if convertation failed
+     */
     public static Column fieldToColumn(Field field) {
         if (field.isAnnotationPresent(DbSkipField.class)) {
             return null;
         }
-
         DbColumn dbColumn = field.getAnnotation(DbColumn.class);
 
         String columnName = null;
-        String type = null;
+        String sqlRep = null;
         String customAdditional = null;
 
         if (dbColumn != null) {
             columnName = dbColumn.name();
-            type = dbColumn.type().getName();
+            sqlRep = dbColumn.type().getSqlRep();
             customAdditional = dbColumn.additional();
         }
 
@@ -50,58 +56,21 @@ public class ReflectionUtils {
             columnName = field.getName();
         }
 
-        if (TextUtils.isEmpty(type)) {
-            FieldType key = FieldType.byTypeClass(field.getType());
-            if (key != null) {
-                DBType dbType = getDbType(key);
-                type = dbType.getName();
+        if (TextUtils.isEmpty(sqlRep)) {
+            FieldType fieldType = FieldType.byTypeClass(field.getType());
+            if (fieldType != null) {
+                DbType dbType = fieldType.getDbType();
+                sqlRep = dbType.getSqlRep();
             }
         }
 
         if (!TextUtils.isEmpty(customAdditional)) {
-            type = TextUtils.concat(type, " ", customAdditional).toString();
+            sqlRep = TextUtils.concat(sqlRep, " ", customAdditional).toString();
         }
-
-        return new Column(columnName, type);
-    }
-
-    private static DBType getDbType(FieldType key) {
-        DBType dbType = null;
-        try {
-            switch (key) {
-                case INTEGER:
-                    dbType = DBType.INT;
-                    break;
-                case STRING:
-                    dbType = DBType.TEXT;
-                    break;
-                case BYTE:
-                    dbType = DBType.BLOB;
-                    break;
-                case SHORT:
-                    dbType = DBType.NUMERIC;
-                    break;
-                case LONG:
-                    dbType = DBType.NUMERIC;
-                    break;
-                case FLOAT:
-                    dbType = DBType.REAL;
-                    break;
-                case DOUBLE:
-                    dbType = DBType.REAL;
-                    break;
-                case BOOLEAN:
-                    dbType = DBType.INT;
-                    break;
-                case DATE:
-                    dbType = DBType.NUMERIC;
-                    break;
-                default:
-                    break;
-            }
-        } catch (IllegalArgumentException e) {
-            e.printStackTrace();
+        Column column = null;
+        if (TextUtils.isEmpty(columnName) || TextUtils.isEmpty(sqlRep)) {
+            column = new Column(columnName, sqlRep);
         }
-        return dbType;
+        return column;
     }
 }
