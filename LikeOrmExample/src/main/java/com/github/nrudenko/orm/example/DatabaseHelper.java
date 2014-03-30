@@ -31,14 +31,9 @@ public class DatabaseHelper extends BaseSQLiteOpenHelper {
     }
 
     @Override
-    protected String getAuthority() {
-        return CONTENT_AUTHORITY;
-    }
-
-    @Override
     protected void appendSchemas(List<Class> classes) {
-        classes.add(Message.class);
-        classes.add(ExampleModel.class);
+//        classes.add(Message.class);
+//        classes.add(ExampleModel.class);
         classes.add(Attach.class);
     }
 

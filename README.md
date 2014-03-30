@@ -1,5 +1,5 @@
-orm
-===
+LikeOrm
+=======
 
 Simple orm like lib for android
 
@@ -7,7 +7,7 @@ For implementation see LikeOrmExample.
 
 Main points:
 
-- extend your db models from OrmModel
+- "database" model should be annotated by @Table
 - extend Database helper from com.github.nrudenko.orm.BaseSQLiteOpenHelper
 and fill method appendSchemas() with your db entities clases
 
