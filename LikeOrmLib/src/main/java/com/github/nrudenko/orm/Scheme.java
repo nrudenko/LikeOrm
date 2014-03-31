@@ -2,6 +2,7 @@ package com.github.nrudenko.orm;
 
 import com.github.nrudenko.orm.annotation.Table;
 import com.github.nrudenko.orm.commons.Column;
+import com.github.nrudenko.orm.commons.DbType;
 
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -25,6 +26,7 @@ public class Scheme {
 
     public ArrayList<Column> getColumns() {
         ArrayList<Column> result = new ArrayList<Column>();
+        result.add(new Column("_id", "INTEGER PRIMARY KEY AUTOINCREMENT"));
         ArrayList<Field> classFields = ReflectionUtils.getClassFields(modelClass);
         for (int i = 0; i < classFields.size(); i++) {
             Field field = classFields.get(i);

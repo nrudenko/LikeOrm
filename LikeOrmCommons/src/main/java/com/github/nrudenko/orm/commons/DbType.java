@@ -1,7 +1,6 @@
 package com.github.nrudenko.orm.commons;
 
 public enum DbType {
-	INT_PRIMARY("INTEGER PRIMARY KEY AUTOINCREMENT"),
 	INT("INTEGER DEFAULT 0"),
 	INT_DEF("INTEGER DEFAULT -1"),
 	REAL("REAL"),
