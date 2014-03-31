@@ -18,7 +18,6 @@ public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
 
     public BaseSQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
-        OrmUri.getInstance(context);
     }
 
     @Override
