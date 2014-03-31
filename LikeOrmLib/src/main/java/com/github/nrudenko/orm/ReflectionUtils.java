@@ -11,7 +11,6 @@ import com.github.nrudenko.orm.commons.FieldType;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.HashMap;
 
 public class ReflectionUtils {
 
@@ -68,7 +67,7 @@ public class ReflectionUtils {
             sqlRep = TextUtils.concat(sqlRep, " ", customAdditional).toString();
         }
         Column column = null;
-        if (TextUtils.isEmpty(columnName) || TextUtils.isEmpty(sqlRep)) {
+        if (!TextUtils.isEmpty(columnName) || !TextUtils.isEmpty(sqlRep)) {
             column = new Column(columnName, sqlRep);
         }
         return column;
