@@ -8,6 +8,7 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
+import java.sql.SQLException;
 import java.util.List;
 
 public abstract class LikeOrmContentProvider extends ContentProvider {
@@ -28,7 +29,7 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     public abstract LikeOrmSQLiteOpenHelper getDbHelper();
 
     @Override
-    public boolean onCreate(){
+    public boolean onCreate() {
         authority = MetaDataParser.getAuthority(getContext(), getClass());
         uriMatcher = buildUriMatcher();
         return true;
@@ -62,6 +63,24 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
         long id = db.insertOrThrow(table, null, contentValues);
         notifyUri(uri);
         return ContentUris.withAppendedId(uri, id);
+    }
+
+    @Override
+    public int bulkInsert(Uri uri, ContentValues[] values) {
+        SQLiteDatabase db = getDbHelper().getWritableDatabase();
+        String table = getTable(uri);
+        db.beginTransaction();
+        try{
+            for (int i = 0; i < values.length; i++) {
+                ContentValues value = values[i];
+                db.insert(table, null, value);
+            }
+            db.setTransactionSuccessful();
+        }
+        finally{
+            db.endTransaction();
+        }
+        return super.bulkInsert(uri, values);
     }
 
     @Override
