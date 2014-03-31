@@ -11,6 +11,7 @@ import com.github.nrudenko.orm.commons.FieldType;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 public class CursorUtil {
 
@@ -31,6 +32,10 @@ public class CursorUtil {
 
         ContentValues contentValues = new ContentValues();
         DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
+        if (contentValues.size() == 0) {
+            return null;
+        }
+
         ArrayList<Field> fields = ReflectionUtils.getClassFields(modelClass);
 
         for (Field field : fields) {
@@ -102,6 +107,16 @@ public class CursorUtil {
             }
         }
         return model;
+    }
+
+    public static ContentValues[] objectToContentValues(List items) {
+        ContentValues[] contentValues = new ContentValues[items.size()];
+        // TODO sync for items?
+        for (int i = 0; i < items.size(); i++) {
+            Object o = items.get(i);
+            contentValues[i] = objectToContentValues(o);
+        }
+        return  contentValues;
     }
 
     public static ContentValues objectToContentValues(Object model) {

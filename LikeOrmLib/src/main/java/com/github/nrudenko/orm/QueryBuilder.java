@@ -6,22 +6,25 @@ import android.content.Context;
 import android.database.Cursor;
 import android.net.Uri;
 
+import java.util.List;
 
-public class QueryBuilder {
+
+public class QueryBuilder<T> {
+
     private final Uri baseUri;
-
-    public Uri uri;
-    public String[] projection;
-    public String where;
-    public String[] whereArgs;
-    public String sortOrder;
+    protected Uri uri;
+    protected String[] projection;
+    protected String where;
+    protected String[] whereArgs;
+    protected String sortOrder;
 
     public QueryBuilder(Context context, Class<? extends ContentProvider> providerClass) {
         String authority = MetaDataParser.getAuthority(context, providerClass);
-        baseUri = Uri.parse("content://" + authority);
+        this.baseUri = Uri.parse("content://" + authority);
+        this.contentResolver = context.getContentResolver();
     }
 
-    public QueryBuilder table(Class aClass) {
+    public QueryBuilder table(Class<T> aClass) {
         uri = Uri.withAppendedPath(baseUri, "/table/" + aClass.getSimpleName());
         return this;
     }
@@ -36,14 +39,42 @@ public class QueryBuilder {
         return this;
     }
 
-    public static QueryBuilder build(Context context, Class<? extends ContentProvider> providerClass) {
-        return new QueryBuilder(context, providerClass);
-    }
-
-    public Cursor query(ContentResolver contentResolver) {
+    public Cursor query() {
         return contentResolver.query(uri, projection, where, whereArgs, sortOrder);
     }
-    public Uri insert(ContentResolver contentResolver, Object object) {
-        return contentResolver.insert(uri, CursorUtil.objectToContentValues(object));
+
+    public Uri insert(T object) {
+        return this.contentResolver.insert(uri, CursorUtil.objectToContentValues(object));
     }
+
+    public int insert(List<T> objects) {
+        return contentResolver.bulkInsert(uri, CursorUtil.objectToContentValues(objects));
+    }
+
+
+    ///////////////////////////////////////////////////////////////////////////
+    // Getters / Setters
+    ///////////////////////////////////////////////////////////////////////////
+
+    public Uri getUri() {
+        return uri;
+    }
+
+    public String[] getProjection() {
+        return projection;
+    }
+
+    public String getWhere() {
+        return where;
+    }
+
+    public String[] getWhereArgs() {
+        return whereArgs;
+    }
+
+    public String getSortOrder() {
+        return sortOrder;
+    }
+
+    private ContentResolver contentResolver;
 }

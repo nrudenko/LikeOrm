@@ -8,7 +8,6 @@ import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 
-import java.sql.SQLException;
 import java.util.List;
 
 public abstract class LikeOrmContentProvider extends ContentProvider {
@@ -18,21 +17,19 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     private UriMatcher uriMatcher;
     private String authority;
 
+    @Override
+    public boolean onCreate() {
+        authority = MetaDataParser.getAuthority(getContext(), getClass());
+        uriMatcher = buildUriMatcher();
+        return true;
+    }
+
     protected UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         matcher.addURI(authority, "table/*", ENTITY);
 
         return matcher;
-    }
-
-    public abstract LikeOrmSQLiteOpenHelper getDbHelper();
-
-    @Override
-    public boolean onCreate() {
-        authority = MetaDataParser.getAuthority(getContext(), getClass());
-        uriMatcher = buildUriMatcher();
-        return true;
     }
 
     @Override
@@ -50,6 +47,21 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
         return cursor;
     }
 
+    public abstract LikeOrmSQLiteOpenHelper getDbHelper();
+
+    private String getTable(Uri uri) {
+        String tableName;
+        switch (uriMatcher.match(uri)) {
+            case ENTITY:
+                List<String> segments = uri.getPathSegments();
+                tableName = segments.get(segments.size() - 1);
+                break;
+            default:
+                throw new RuntimeException("Can't find table from uri: " + uri);
+        }
+        return tableName;
+    }
+
     @Override
     public String getType(Uri uri) {
         //TODO need to implement
@@ -60,9 +72,15 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     public Uri insert(Uri uri, ContentValues contentValues) {
         final SQLiteDatabase db = getDbHelper().getWritableDatabase();
         String table = getTable(uri);
-        long id = db.insertOrThrow(table, null, contentValues);
+        long id = db.insert(table, null, contentValues);
         notifyUri(uri);
         return ContentUris.withAppendedId(uri, id);
+    }
+
+    private void notifyUri(Uri uri) {
+        if (getContext() != null) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
     }
 
     @Override
@@ -70,14 +88,12 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
         SQLiteDatabase db = getDbHelper().getWritableDatabase();
         String table = getTable(uri);
         db.beginTransaction();
-        try{
-            for (int i = 0; i < values.length; i++) {
-                ContentValues value = values[i];
+        try {
+            for (ContentValues value : values) {
                 db.insert(table, null, value);
             }
             db.setTransactionSuccessful();
-        }
-        finally{
+        } finally {
             db.endTransaction();
         }
         return super.bulkInsert(uri, values);
@@ -92,25 +108,6 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
             notifyUri(uri);
         }
         return deleteResult;
-    }
-
-    private void notifyUri(Uri uri) {
-        if (getContext() != null) {
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
-    }
-
-    private String getTable(Uri uri) {
-        String tableName;
-        switch (uriMatcher.match(uri)) {
-            case ENTITY:
-                List<String> segments = uri.getPathSegments();
-                tableName = segments.get(segments.size() - 1);
-                break;
-            default:
-                throw new RuntimeException("Can't find table from uri: " + uri);
-        }
-        return tableName;
     }
 
     @Override
