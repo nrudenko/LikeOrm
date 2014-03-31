@@ -25,7 +25,7 @@ public class QueryBuilder<T> {
     }
 
     public QueryBuilder<T> table(Class<T> aClass) {
-        uri = Uri.withAppendedPath(baseUri, "/table/" + aClass.getSimpleName());
+        uri = Uri.withAppendedPath(baseUri, "table/" + aClass.getSimpleName());
         return this;
     }
 

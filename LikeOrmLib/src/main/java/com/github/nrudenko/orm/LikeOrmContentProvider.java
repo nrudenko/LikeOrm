@@ -87,16 +87,19 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     public int bulkInsert(Uri uri, ContentValues[] values) {
         SQLiteDatabase db = getDbHelper().getWritableDatabase();
         String table = getTable(uri);
+        int count = 0;
         db.beginTransaction();
         try {
             for (ContentValues value : values) {
                 db.insert(table, null, value);
+                count++;
             }
             db.setTransactionSuccessful();
+            notifyUri(uri);
         } finally {
             db.endTransaction();
         }
-        return super.bulkInsert(uri, values);
+        return count;
     }
 
     @Override
