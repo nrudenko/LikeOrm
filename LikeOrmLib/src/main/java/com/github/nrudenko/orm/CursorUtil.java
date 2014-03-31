@@ -19,7 +19,26 @@ public class CursorUtil {
     }
 
     public static <T> T cursorToObject(Cursor cursor, Class<T> modelClass) {
-        T model = null;
+        if (cursor.getCount() == 0) {
+            return null;
+        }
+        return buildModel(modelClass, cursor);
+    }
+
+    public static <T> List<T> cursorToList(Cursor cursor, Class<T> modelClass) {
+        List<T> items = new ArrayList<T>();
+        while (cursor.moveToNext()) {
+            final T model = buildModel(modelClass, cursor);
+            items.add(model);
+        }
+        return items;
+    }
+
+    private static <T> T buildModel(Class<T> modelClass, Cursor cursor) {
+        ContentValues contentValues = new ContentValues();
+        DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
+
+        T model;
         try {
             model = modelClass.newInstance();
         } catch (InstantiationException e) {
@@ -27,12 +46,6 @@ public class CursorUtil {
             return null;
         } catch (IllegalAccessException e) {
             e.printStackTrace();
-            return null;
-        }
-
-        ContentValues contentValues = new ContentValues();
-        DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
-        if (contentValues.size() == 0) {
             return null;
         }
 

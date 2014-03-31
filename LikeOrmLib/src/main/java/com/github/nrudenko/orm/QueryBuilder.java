@@ -24,12 +24,12 @@ public class QueryBuilder<T> {
         this.contentResolver = context.getContentResolver();
     }
 
-    public QueryBuilder table(Class<T> aClass) {
+    public QueryBuilder<T> table(Class<T> aClass) {
         uri = Uri.withAppendedPath(baseUri, "/table/" + aClass.getSimpleName());
         return this;
     }
 
-    public QueryBuilder projection(Object... columns) {
+    public QueryBuilder<T> projection(Object... columns) {
         int length = columns.length;
         this.projection = new String[length];
         for (int i = 0; i < columns.length; i++) {
