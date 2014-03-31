@@ -12,11 +12,11 @@ import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
 
-public abstract class BaseSQLiteOpenHelper extends SQLiteOpenHelper {
+public abstract class LikeOrmSQLiteOpenHelper extends SQLiteOpenHelper {
 
-    public static final String TAG = "LikeOrmOpenHelper";
+    public static final String TAG = LikeOrmSQLiteOpenHelper.class.getSimpleName();
 
-    public BaseSQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
+    public LikeOrmSQLiteOpenHelper(Context context, String name, SQLiteDatabase.CursorFactory factory, int version) {
         super(context, name, factory, version);
     }
 

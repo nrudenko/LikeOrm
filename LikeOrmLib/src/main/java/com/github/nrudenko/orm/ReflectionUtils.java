@@ -9,6 +9,7 @@ import com.github.nrudenko.orm.commons.DbType;
 import com.github.nrudenko.orm.commons.FieldType;
 
 import java.lang.reflect.Field;
+import java.lang.reflect.Modifier;
 import java.util.ArrayList;
 import java.util.Arrays;
 
@@ -36,7 +37,7 @@ public class ReflectionUtils {
      * @return Column or null if convertation failed
      */
     public static Column fieldToColumn(Field field) {
-        if (field.isAnnotationPresent(DbSkipField.class)) {
+        if (field.isAnnotationPresent(DbSkipField.class) || Modifier.isStatic(field.getModifiers())) {
             return null;
         }
         DbColumn dbColumn = field.getAnnotation(DbColumn.class);

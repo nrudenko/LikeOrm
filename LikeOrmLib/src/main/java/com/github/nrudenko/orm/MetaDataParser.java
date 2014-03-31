@@ -1,5 +1,6 @@
 package com.github.nrudenko.orm;
 
+import android.content.ContentProvider;
 import android.content.Context;
 import android.content.pm.ApplicationInfo;
 import android.content.pm.PackageInfo;
@@ -33,7 +34,7 @@ public class MetaDataParser {
         return "";
     }
 
-    public static String getAuthority(Context context, Class<? extends LikeOrmContentProvider> providerClass) {
+    public static String getAuthority(Context context, Class<? extends ContentProvider> providerClass) {
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
                 PackageManager.GET_PROVIDERS);

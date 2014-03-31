@@ -14,13 +14,8 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
 
     public static final int ENTITY = 100;
 
-    private final UriMatcher uriMatcher;
-    private final String authority;
-
-    public LikeOrmContentProvider() {
-        authority = MetaDataParser.getAuthority(getContext(), getClass());
-        uriMatcher = buildUriMatcher();
-    }
+    private UriMatcher uriMatcher;
+    private String authority;
 
     protected UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
@@ -30,10 +25,14 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
         return matcher;
     }
 
-    public abstract BaseSQLiteOpenHelper getDbHelper();
+    public abstract LikeOrmSQLiteOpenHelper getDbHelper();
 
     @Override
-    public abstract boolean onCreate();
+    public boolean onCreate(){
+        authority = MetaDataParser.getAuthority(getContext(), getClass());
+        uriMatcher = buildUriMatcher();
+        return true;
+    }
 
     @Override
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {

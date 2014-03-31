@@ -3,6 +3,7 @@ package com.github.nrudenko.orm;
 import android.content.ContentValues;
 import android.database.Cursor;
 import android.database.DatabaseUtils;
+import android.text.TextUtils;
 
 import com.github.nrudenko.orm.annotation.DbSkipField;
 import com.github.nrudenko.orm.commons.FieldType;
@@ -16,10 +17,21 @@ public class CursorUtil {
     private CursorUtil() {
     }
 
-    public static <T> T cursorToObject(Cursor cursor, T model) {
+    public static <T> T cursorToObject(Cursor cursor, Class<T> modelClass) {
+        T model = null;
+        try {
+            model = modelClass.newInstance();
+        } catch (InstantiationException e) {
+            e.printStackTrace();
+            return null;
+        } catch (IllegalAccessException e) {
+            e.printStackTrace();
+            return null;
+        }
+
         ContentValues contentValues = new ContentValues();
         DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
-        ArrayList<Field> fields = ReflectionUtils.getClassFields(model.getClass());
+        ArrayList<Field> fields = ReflectionUtils.getClassFields(modelClass);
 
         for (Field field : fields) {
             String fieldName = field.getName();
@@ -66,13 +78,15 @@ public class CursorUtil {
                             }
                             break;
                         case ENUM:
-                            String value = contentValues.getAsString(fieldName);
-                            try {
-                                Field enumField = field.getType().getField(value);
-                                field.set(model, enumField.get(model));
-                            } catch (NoSuchFieldException e) {
-                                e.printStackTrace();
-                                //TODO handle errors
+                            String enumName = contentValues.getAsString(fieldName);
+                            if (!TextUtils.isEmpty(enumName)) {
+                                try {
+                                    Field enumField = field.getType().getField(enumName);
+                                    field.set(model, enumField.get(model));
+                                } catch (NoSuchFieldException e) {
+                                    e.printStackTrace();
+                                    //TODO handle errors
+                                }
                             }
                             break;
                         default:
