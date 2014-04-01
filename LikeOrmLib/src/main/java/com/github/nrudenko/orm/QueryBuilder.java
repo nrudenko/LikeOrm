@@ -5,6 +5,7 @@ import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.Context;
 import android.database.Cursor;
+import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
@@ -19,13 +20,14 @@ import static com.github.nrudenko.orm.CursorUtil.objectToContentValues;
 
 public class QueryBuilder<T> {
 
+    private String table;
     private final Uri baseUri;
     private Uri uri;
     private String[] projection;
-    private StringBuilder where;
-    private List<String> whereArgs = new ArrayList<String>();
-    private StringBuilder sortOrder;
-    private StringBuilder groupBy;
+    private StringBuilder where = new StringBuilder();
+    private ArrayList<String> whereArgs = new ArrayList<String>();
+    private StringBuilder sortOrder = new StringBuilder();
+    private StringBuilder groupBy = new StringBuilder();
     private String limit;
 
     public QueryBuilder(Context context, Class<? extends ContentProvider> providerClass) {
@@ -35,7 +37,8 @@ public class QueryBuilder<T> {
     }
 
     public QueryBuilder<T> table(Class<T> aClass) {
-        uri = Uri.withAppendedPath(baseUri, "table/" + aClass.getSimpleName());
+        table = aClass.getSimpleName();
+        uri = Uri.withAppendedPath(baseUri, "table/" + table);
         return this;
     }
 
@@ -50,6 +53,9 @@ public class QueryBuilder<T> {
     }
 
     public QueryBuilder<T> where(Column column) {
+        if (where.length() > 0) {
+            where.append(" AND ");
+        }
         where.append(column.getName());
         return this;
     }
@@ -69,6 +75,13 @@ public class QueryBuilder<T> {
         return this;
     }
 
+    public QueryBuilder<T> is(Column column) {
+        where
+                .append("=")
+                .append(column.getName());
+        return this;
+    }
+
     public QueryBuilder<T> in(List<String> in) {
         where.append("IN (" + preparePlaceHolders(in.size()) + ")");
         whereArgs.addAll(in);
@@ -76,11 +89,16 @@ public class QueryBuilder<T> {
     }
 
     private void updateWhere(String operation, Object value) {
-        whereArgs.add(value.toString());
+        if (value instanceof Boolean) {
+            String booleanVal = (Boolean) value ? "1" : "0";
+            whereArgs.add(booleanVal);
+        } else {
+            whereArgs.add(value.toString());
+        }
         where.append(operation);
     }
 
-    public QueryBuilder<T> sortOrder(SortOrder... sortOrders) {
+    public QueryBuilder<T> orderBy(SortOrder... sortOrders) {
         for (int i = 0; i < sortOrders.length; i++) {
             SortOrder order = sortOrders[i];
             sortOrder.append(order.sql);
@@ -157,28 +175,51 @@ public class QueryBuilder<T> {
     }
 
     public String getWhere() {
-        if (groupBy != null) {
-            where.append(" ").append(groupBy.toString());
+        if (groupBy.length() > 0) {
+            where
+                    .append(" ")
+                    .append(groupBy);
         }
-        return where.toString();
+        return getStringOrNull(where);
     }
 
     public String[] getWhereArgs() {
-        return (String[]) whereArgs.toArray();
+        String[] args = new String[whereArgs.size()];
+        whereArgs.toArray(args);
+        return args;
     }
 
     public String getSortOrder() {
         if (!TextUtils.isEmpty(limit)) {
-            if (sortOrder != null) {
-                sortOrder.append(limit);
-            } else {
-                sortOrder = new StringBuilder(limit);
-            }
+            sortOrder
+                    .append(" ")
+                    .append(limit);
         }
-        return sortOrder.toString();
+        return getStringOrNull(sortOrder);
+    }
+
+    private String getStringOrNull(StringBuilder builder) {
+        if (builder != null && builder.length() > 0) {
+            return builder.toString();
+        }
+        return null;
     }
 
     private ContentResolver contentResolver;
+
+    public String toRawQuery() {
+        return SQLiteQueryBuilder.buildQueryString(
+                false, table, getProjection(), getWhere(), null, null, getSortOrder(), null);
+    }
+
+    public String toRawColumnQuery(String as) {
+        StringBuilder raw = new StringBuilder("(");
+        raw
+                .append(toRawQuery())
+                .append(") AS ")
+                .append(as);
+        return raw.toString();
+    }
 
     class QueryLoader extends AsyncQueryHandler {
 

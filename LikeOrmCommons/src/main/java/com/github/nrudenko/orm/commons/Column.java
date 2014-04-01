@@ -1,11 +1,14 @@
 package com.github.nrudenko.orm.commons;
 
-import javax.swing.plaf.TextUI;
-
 public class Column {
     String name;
     DbType type;
     String customAdditional;
+
+    public Column(String name) {
+        this.name = name;
+        this.type = DbType.NO_TYPE;
+    }
 
     public Column(String name, DbType type) {
         this.name = name;
