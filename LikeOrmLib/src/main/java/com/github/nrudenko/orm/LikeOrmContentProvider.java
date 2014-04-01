@@ -44,23 +44,14 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
                 break;
         }
 
+        if (cursor != null && getContext() != null) {
+            cursor.setNotificationUri(getContext().getContentResolver(), uri);
+        }
+
         return cursor;
     }
 
     public abstract LikeOrmSQLiteOpenHelper getDbHelper();
-
-    private String getTable(Uri uri) {
-        String tableName;
-        switch (uriMatcher.match(uri)) {
-            case ENTITY:
-                List<String> segments = uri.getPathSegments();
-                tableName = segments.get(segments.size() - 1);
-                break;
-            default:
-                throw new RuntimeException("Can't find table from uri: " + uri);
-        }
-        return tableName;
-    }
 
     @Override
     public String getType(Uri uri) {
@@ -75,12 +66,6 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
         long id = db.insert(table, null, contentValues);
         notifyUri(uri);
         return ContentUris.withAppendedId(uri, id);
-    }
-
-    private void notifyUri(Uri uri) {
-        if (getContext() != null) {
-            getContext().getContentResolver().notifyChange(uri, null);
-        }
     }
 
     @Override
@@ -103,6 +88,11 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     }
 
     @Override
+    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
+        return 0;
+    }
+
+    @Override
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = getDbHelper().getWritableDatabase();
         String table = getTable(uri);
@@ -113,9 +103,23 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
         return deleteResult;
     }
 
-    @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+    private void notifyUri(Uri uri) {
+        if (getContext() != null) {
+            getContext().getContentResolver().notifyChange(uri, null);
+        }
+    }
+
+    private String getTable(Uri uri) {
+        String tableName;
+        switch (uriMatcher.match(uri)) {
+            case ENTITY:
+                List<String> segments = uri.getPathSegments();
+                tableName = segments.get(segments.size() - 1);
+                break;
+            default:
+                throw new RuntimeException("Can't find table from uri: " + uri);
+        }
+        return tableName;
     }
 
 }
