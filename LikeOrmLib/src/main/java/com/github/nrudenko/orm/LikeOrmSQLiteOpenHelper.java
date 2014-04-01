@@ -46,10 +46,7 @@ public abstract class LikeOrmSQLiteOpenHelper extends SQLiteOpenHelper {
             if (columnsSql.length() > 0) {
                 columnsSql.append(",");
             }
-            columnsSql.append(column.getName());
-            columnsSql
-                .append(" ")
-                .append(column.getType());
+            columnsSql.append(column.getColumnsSql());
         }
 
         if (columnsSql.length() > 0) {
@@ -67,13 +64,5 @@ public abstract class LikeOrmSQLiteOpenHelper extends SQLiteOpenHelper {
         sql.append(");");
         Log.d(TAG, sql.toString());
         return false;
-    }
-
-    public static String preparePlaceHolders(int count) {
-        String result = "";
-        for (int i = 0; i < count; i++) {
-            result += i > 0 ? ",?" : "?";
-        }
-        return result;
     }
 }

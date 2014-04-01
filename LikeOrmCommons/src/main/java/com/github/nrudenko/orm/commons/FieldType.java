@@ -32,10 +32,6 @@ public enum FieldType {
         return dbType;
     }
 
-    public String getDbTypeReference() {
-        return DbType.class.getSimpleName() + "." + dbType.toString();
-    }
-
     public static FieldType byTypeClass(Class cls) {
         return findBy(classPredicate, cls);
     }

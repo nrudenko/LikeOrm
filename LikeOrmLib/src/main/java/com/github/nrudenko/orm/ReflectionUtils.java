@@ -43,12 +43,12 @@ public class ReflectionUtils {
         DbColumn dbColumn = field.getAnnotation(DbColumn.class);
 
         String columnName = null;
-        String sqlRep = null;
         String customAdditional = null;
+        DbType dbType = null;
 
         if (dbColumn != null) {
             columnName = dbColumn.name();
-            sqlRep = dbColumn.type().getSqlRep();
+            dbType = dbColumn.type();
             customAdditional = dbColumn.additional();
         }
 
@@ -56,20 +56,19 @@ public class ReflectionUtils {
             columnName = field.getName();
         }
 
-        if (TextUtils.isEmpty(sqlRep)) {
+        if (dbType == null || dbType.equals(DbType.NO_TYPE)) {
             FieldType fieldType = FieldType.byTypeClass(field.getType());
             if (fieldType != null) {
-                DbType dbType = fieldType.getDbType();
-                sqlRep = dbType.getSqlRep();
+                dbType = fieldType.getDbType();
             }
         }
 
-        if (!TextUtils.isEmpty(customAdditional)) {
-            sqlRep = TextUtils.concat(sqlRep, " ", customAdditional).toString();
-        }
         Column column = null;
-        if (!TextUtils.isEmpty(columnName) || !TextUtils.isEmpty(sqlRep)) {
-            column = new Column(columnName, sqlRep);
+        if (!TextUtils.isEmpty(columnName) || dbType != null) {
+            column = new Column(columnName, dbType);
+            if (!TextUtils.isEmpty(customAdditional)) {
+                column.setCustomAdditional(customAdditional);
+            }
         }
         return column;
     }

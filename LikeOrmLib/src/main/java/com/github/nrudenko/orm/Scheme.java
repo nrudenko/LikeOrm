@@ -11,7 +11,7 @@ public class Scheme {
     final Table table;
     final Class<?> modelClass;
 
-    public Scheme(Class modelClass) throws ClassCastException, IllegalArgumentException{
+    public Scheme(Class modelClass) throws ClassCastException, IllegalArgumentException {
         this.modelClass = modelClass;
         this.table = (Table) modelClass.getAnnotation(Table.class);
         if (table == null) {
@@ -26,7 +26,7 @@ public class Scheme {
 
     public ArrayList<Column> getColumns() {
         ArrayList<Column> result = new ArrayList<Column>();
-        result.add(new Column("_id", "INTEGER PRIMARY KEY AUTOINCREMENT"));
+        result.add(new Column("_id", DbType.INT, "PRIMARY KEY AUTOINCREMENT"));
         ArrayList<Field> classFields = ReflectionUtils.getClassFields(modelClass);
         for (int i = 0; i < classFields.size(); i++) {
             Field field = classFields.get(i);
