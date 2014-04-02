@@ -25,15 +25,6 @@ public class CursorUtil {
         return buildModel(modelClass, cursor);
     }
 
-    public static <T> List<T> cursorToList(Cursor cursor, Class<T> modelClass) {
-        List<T> items = new ArrayList<T>();
-        while (cursor.moveToNext()) {
-            final T model = buildModel(modelClass, cursor);
-            items.add(model);
-        }
-        return items;
-    }
-
     private static <T> T buildModel(Class<T> modelClass, Cursor cursor) {
         ContentValues contentValues = new ContentValues();
         DatabaseUtils.cursorRowToContentValues(cursor, contentValues);
@@ -60,7 +51,7 @@ public class CursorUtil {
                 Class<?> type = field.getType();
                 FieldType fieldType = FieldType.byTypeClass(type);
                 field.setAccessible(true);
-                if (fieldType != null) {
+                if (fieldType != null && contentValues.get(fieldName) != null) {
                     switch (fieldType) {
                         case INTEGER:
                             field.set(model, contentValues.getAsInteger(fieldName));
@@ -122,6 +113,15 @@ public class CursorUtil {
         return model;
     }
 
+    public static <T> List<T> cursorToList(Cursor cursor, Class<T> modelClass) {
+        List<T> items = new ArrayList<T>();
+        while (cursor.moveToNext()) {
+            final T model = buildModel(modelClass, cursor);
+            items.add(model);
+        }
+        return items;
+    }
+
     public static ContentValues[] objectToContentValues(List items) {
         ContentValues[] contentValues = new ContentValues[items.size()];
         // TODO sync for items?
@@ -129,7 +129,7 @@ public class CursorUtil {
             Object o = items.get(i);
             contentValues[i] = objectToContentValues(o);
         }
-        return  contentValues;
+        return contentValues;
     }
 
     public static ContentValues objectToContentValues(Object model) {
