@@ -26,7 +26,7 @@ public class QueryBuilder<T> {
     private String[] projection;
     private StringBuilder where = new StringBuilder();
     private ArrayList<String> whereArgs = new ArrayList<String>();
-    private StringBuilder sortOrder = new StringBuilder();
+    private StringBuilder orderBy = new StringBuilder();
     private StringBuilder groupBy = new StringBuilder();
     private String limit;
 
@@ -101,7 +101,7 @@ public class QueryBuilder<T> {
     public QueryBuilder<T> orderBy(SortOrder... sortOrders) {
         for (int i = 0; i < sortOrders.length; i++) {
             SortOrder order = sortOrders[i];
-            sortOrder.append(order.sql);
+            orderBy.append(order.sql);
         }
         return this;
     }
@@ -139,11 +139,11 @@ public class QueryBuilder<T> {
     }
 
     public Cursor query() {
-        return contentResolver.query(uri, projection, getWhere(), getWhereArgs(), getSortOrder());
+        return contentResolver.query(uri, projection, getWhere(), getWhereArgs(), getOrderBy());
     }
 
     public void query(OnLoadFinishedListener loadFinishedListener) {
-        new QueryLoader(contentResolver, loadFinishedListener).startQuery(0, null, getUri(), getProjection(), getWhere(), getWhereArgs(), getSortOrder());
+        new QueryLoader(contentResolver, loadFinishedListener).startQuery(0, null, getUri(), getProjection(), getWhere(), getWhereArgs(), getOrderBy());
     }
 
     public Uri insert(T object) {
@@ -175,12 +175,14 @@ public class QueryBuilder<T> {
     }
 
     public String getWhere() {
+        StringBuilder result = new StringBuilder();
+        result.append(where);
         if (groupBy.length() > 0) {
-            where
+            result
                     .append(" ")
                     .append(groupBy);
         }
-        return getStringOrNull(where);
+        return getStringOrNull(result);
     }
 
     public String[] getWhereArgs() {
@@ -189,13 +191,15 @@ public class QueryBuilder<T> {
         return args;
     }
 
-    public String getSortOrder() {
+    public String getOrderBy() {
+        StringBuilder result = new StringBuilder();
+        result.append(orderBy);
         if (!TextUtils.isEmpty(limit)) {
-            sortOrder
+            result
                     .append(" ")
                     .append(limit);
         }
-        return getStringOrNull(sortOrder);
+        return getStringOrNull(result);
     }
 
     private String getStringOrNull(StringBuilder builder) {
@@ -209,15 +213,15 @@ public class QueryBuilder<T> {
 
     public String toRawQuery() {
         return SQLiteQueryBuilder.buildQueryString(
-                false, table, getProjection(), getWhere(), null, null, getSortOrder(), null);
+                false, table, getProjection(), getWhere(), null, null, getOrderBy(), null);
     }
 
-    public String toRawColumnQuery(String as) {
+    public String toRawColumnQuery(Column column) {
         StringBuilder raw = new StringBuilder("(");
         raw
                 .append(toRawQuery())
                 .append(") AS ")
-                .append(as);
+                .append(column.getName());
         return raw.toString();
     }
 

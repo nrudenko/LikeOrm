@@ -4,6 +4,7 @@ import android.text.TextUtils;
 
 import com.github.nrudenko.orm.annotation.DbColumn;
 import com.github.nrudenko.orm.annotation.DbSkipField;
+import com.github.nrudenko.orm.annotation.VirtualColumn;
 import com.github.nrudenko.orm.commons.Column;
 import com.github.nrudenko.orm.commons.DbType;
 import com.github.nrudenko.orm.commons.FieldType;
@@ -37,7 +38,9 @@ public class ReflectionUtils {
      * @return Column or null if convertation failed
      */
     public static Column fieldToColumn(Field field) {
-        if (field.isAnnotationPresent(DbSkipField.class) || Modifier.isStatic(field.getModifiers())) {
+        if (field.isAnnotationPresent(DbSkipField.class)
+                || field.isAnnotationPresent(VirtualColumn.class)
+                || Modifier.isStatic(field.getModifiers())) {
             return null;
         }
         DbColumn dbColumn = field.getAnnotation(DbColumn.class);

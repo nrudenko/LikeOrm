@@ -6,6 +6,7 @@ import android.database.DatabaseUtils;
 import android.text.TextUtils;
 
 import com.github.nrudenko.orm.annotation.DbSkipField;
+import com.github.nrudenko.orm.annotation.VirtualColumn;
 import com.github.nrudenko.orm.commons.FieldType;
 
 import java.lang.reflect.Field;
@@ -138,7 +139,7 @@ public class CursorUtil {
         for (Field field : classFields) {
             String fieldName = field.getName();
             try {
-                if (field.isAnnotationPresent(DbSkipField.class)) {
+                if (field.isAnnotationPresent(DbSkipField.class) || field.isAnnotationPresent(VirtualColumn.class)) {
                     continue;
                 }
                 FieldType key = FieldType.byTypeClass(field.getType());
