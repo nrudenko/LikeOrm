@@ -9,6 +9,7 @@ public enum DbType {
 	TEXT_NOT_NULL("TEXT NOT NULL"),
     TEXT_DEFAULT_EMPTY("TEXT DEFAULT \"\""),
     BLOB("BLOB"),
+    SERIALIZED("BLOB"),
     NO_TYPE(""); // just for default annotation value
 
 	private String sqlRepresentation;
