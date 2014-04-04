@@ -155,6 +155,10 @@ public class QueryBuilder<T> {
         return contentResolver.bulkInsert(uri, objectToContentValues(objects));
     }
 
+    public void insert(T object, OnLoadFinishedListener loadFinishedListener) {
+        new QueryLoader(contentResolver, loadFinishedListener).startInsert(0, null, getUri(), objectToContentValues(object));
+    }
+
     public int update(T object) {
         return contentResolver.update(getUri(), objectToContentValues(object), getWhere(), getWhereArgs());
     }
