@@ -9,7 +9,7 @@ public class DESC extends SortOrder {
     }
 
     @Override
-    public String getPattern() {
+    protected String getPattern() {
         return  "%s DESC";
     }
 }

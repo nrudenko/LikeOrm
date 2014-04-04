@@ -10,6 +10,7 @@ import android.net.Uri;
 import android.text.TextUtils;
 
 import com.github.nrudenko.orm.commons.Column;
+import com.github.nrudenko.orm.sql.ASC;
 import com.github.nrudenko.orm.sql.SortOrder;
 
 import java.util.ArrayList;
@@ -194,7 +195,11 @@ public class QueryBuilder<T> {
     public String getOrderBy() {
         StringBuilder result = new StringBuilder();
         result.append(orderBy);
+
         if (!TextUtils.isEmpty(limit)) {
+            if (TextUtils.isEmpty(orderBy)) {
+                result.append(new ASC(Scheme._ID).sql); // default is asc by _id
+            }
             result
                     .append(" ")
                     .append(limit);

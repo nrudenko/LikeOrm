@@ -76,7 +76,4 @@ public class ReflectionUtils {
         return column;
     }
 
-//    public static boolean isSerializable(Field field) {
-//        field.
-//    }
 }

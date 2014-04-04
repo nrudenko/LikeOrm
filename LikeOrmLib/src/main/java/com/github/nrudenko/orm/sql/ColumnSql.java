@@ -9,5 +9,5 @@ public abstract class ColumnSql {
         sql = String.format(getPattern(), column.getName());
     }
 
-    public abstract String getPattern();
+    protected abstract String getPattern();
 }

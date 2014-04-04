@@ -26,7 +26,7 @@ public class Scheme {
 
     public ArrayList<Column> getColumns() {
         ArrayList<Column> result = new ArrayList<Column>();
-        result.add(new Column("_id", DbType.INT, "PRIMARY KEY AUTOINCREMENT"));
+        result.add(_ID);
         ArrayList<Field> classFields = ReflectionUtils.getClassFields(modelClass);
         for (int i = 0; i < classFields.size(); i++) {
             Field field = classFields.get(i);
@@ -41,4 +41,6 @@ public class Scheme {
     public String getCustomSql() {
         return modelClass.getAnnotation(Table.class).customSql();
     }
+
+    public static final Column _ID = new Column("_id", DbType.INT, "PRIMARY KEY AUTOINCREMENT");
 }

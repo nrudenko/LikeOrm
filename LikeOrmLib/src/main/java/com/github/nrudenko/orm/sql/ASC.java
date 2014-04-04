@@ -9,7 +9,7 @@ public class ASC extends SortOrder {
     }
 
     @Override
-    public String getPattern() {
+    protected String getPattern() {
         return  "%s ASC";
     }
 }
