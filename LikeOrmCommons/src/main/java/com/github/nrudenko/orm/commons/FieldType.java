@@ -14,7 +14,8 @@ public enum FieldType {
     DOUBLE(DbType.REAL, double.class),
     BLOB(DbType.BLOB, byte[].class),
     DATE(DbType.NUMERIC, Date.class),
-    ENUM(DbType.TEXT, Enum.class);
+    ENUM(DbType.TEXT, Enum.class),
+    SERIALIZED(DbType.SERIALIZED, new Class[0]); // no automatic assignation
 
     private final Class[] cls;
     private final DbType dbType;
@@ -30,6 +31,15 @@ public enum FieldType {
 
     public DbType getDbType() {
         return dbType;
+    }
+
+    public static FieldType byDbType(DbType type) {
+        for (FieldType fieldType : FieldType.values()) {
+            if (fieldType.getDbType().equals(type)) {
+                return fieldType;
+            }
+        }
+        return null;
     }
 
     public static FieldType byTypeClass(Class cls) {
