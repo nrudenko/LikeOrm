@@ -108,6 +108,9 @@ public class CursorUtil {
                             break;
                         case SERIALIZED:
                             final byte[] byteArray = cursor.getBlob(columnIndex);
+                            if (byteArray == null) {
+                                continue;
+                            }
                             if (Serializable.class.isAssignableFrom(field.getType())) {
                                 ByteArrayInputStream bis = new ByteArrayInputStream(byteArray);
                                 ObjectInputStream ois = null;
