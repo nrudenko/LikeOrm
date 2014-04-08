@@ -88,8 +88,12 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     }
 
     @Override
-    public int update(Uri uri, ContentValues contentValues, String s, String[] strings) {
-        return 0;
+    public int update(Uri uri, ContentValues contentValues, String selection, String[] selectionArgs) {
+        final SQLiteDatabase db = getDbHelper().getWritableDatabase();
+        String table = getTable(uri);
+        int result = db.update(table, contentValues, selection, selectionArgs);
+        notifyUri(uri);
+        return result;
     }
 
     @Override
