@@ -7,12 +7,16 @@ import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
+import android.text.TextUtils;
 
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 public abstract class LikeOrmContentProvider extends ContentProvider {
 
-    public static final int ENTITY = 100;
+    public static final int SINGLE_TABLE = 100;
+    private static final int JOIN = 101;
 
     private UriMatcher uriMatcher;
     private String authority;
@@ -27,8 +31,9 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     protected UriMatcher buildUriMatcher() {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
-        matcher.addURI(authority, "table/*", ENTITY);
-
+        matcher.addURI(authority, "table/*", SINGLE_TABLE);
+        // join/table1?joins[1]="LEFT JOIN table2 on column1=column2"
+        matcher.addURI(authority, "join/*", JOIN);
         return matcher;
     }
 
@@ -39,7 +44,8 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
 
         Cursor cursor = null;
         switch (uriMatcher.match(uri)) {
-            case ENTITY:
+            case SINGLE_TABLE:
+            case JOIN:
                 cursor = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
                 break;
         }
@@ -115,10 +121,21 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
 
     private String getTable(Uri uri) {
         String tableName;
+        List<String> segments = uri.getPathSegments();
         switch (uriMatcher.match(uri)) {
-            case ENTITY:
-                List<String> segments = uri.getPathSegments();
+            case SINGLE_TABLE:
                 tableName = segments.get(segments.size() - 1);
+                break;
+            case JOIN:
+                StringBuilder table = new StringBuilder(segments.get(segments.size() - 1));
+                Set<String> queryParameterNames = uri.getQueryParameterNames();
+                Iterator<String> iterator = queryParameterNames.iterator();
+                while (iterator.hasNext()) {
+                    String key = iterator.next();
+                    table.append(" ");
+                    table.append(uri.getQueryParameter(key));
+                }
+                tableName = table.toString();
                 break;
             default:
                 throw new RuntimeException("Can't find table from uri: " + uri);

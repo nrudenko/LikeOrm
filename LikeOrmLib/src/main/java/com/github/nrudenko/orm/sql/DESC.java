@@ -10,6 +10,6 @@ public class DESC extends SortOrder {
 
     @Override
     protected String getPattern() {
-        return  "%s DESC";
+        return "%s DESC";
     }
 }

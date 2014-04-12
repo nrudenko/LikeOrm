@@ -12,6 +12,7 @@ import android.text.TextUtils;
 import com.github.nrudenko.orm.commons.Column;
 import com.github.nrudenko.orm.sql.ASC;
 import com.github.nrudenko.orm.sql.SortOrder;
+import com.github.nrudenko.orm.sql.TableJoin;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -37,9 +38,19 @@ public class QueryBuilder<T> {
         this.contentResolver = context.getContentResolver();
     }
 
-    public QueryBuilder<T> table(Class<T> aClass) {
+    public QueryBuilder<T> table(Class<T> aClass, TableJoin... joins) {
         table = aClass.getSimpleName();
-        uri = Uri.withAppendedPath(baseUri, "table/" + table);
+        Uri.Builder uriBuilder = baseUri.buildUpon();
+        if (joins.length > 0) {
+            uriBuilder.appendPath("join").appendPath(table);
+            for (int i = 0; i < joins.length; i++) {
+                TableJoin join = joins[i];
+                uriBuilder.appendQueryParameter("join[" + i + "]", join.getSql());
+            }
+        } else {
+            uriBuilder.appendPath("table").appendPath(table);
+        }
+        uri = uriBuilder.build();
         return this;
     }
 
@@ -225,13 +236,13 @@ public class QueryBuilder<T> {
                 false, table, getProjection(), getWhere(), null, null, getOrderBy(), null);
     }
 
-    public String toRawColumnQuery(Column column) {
+    public Column asColumn(Column column) {
         StringBuilder raw = new StringBuilder("(");
         raw
                 .append(toRawQuery())
                 .append(") AS ")
                 .append(column.getName());
-        return raw.toString();
+        return new Column(raw.toString());
     }
 
     class QueryLoader extends AsyncQueryHandler {

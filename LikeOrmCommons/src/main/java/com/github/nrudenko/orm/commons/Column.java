@@ -60,6 +60,10 @@ public class Column {
         return columnsSql.toString();
     }
 
+    public Column as(Column column) {
+        return new Column(getName() + " AS " + column.getName());
+    }
+
     @Override
     public String toString() {
         return "Column{" +
