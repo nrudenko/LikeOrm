@@ -32,7 +32,7 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
         final UriMatcher matcher = new UriMatcher(UriMatcher.NO_MATCH);
 
         matcher.addURI(authority, "table/*", SINGLE_TABLE);
-        // join/table1?joins[1]="LEFT JOIN table2 on column1=column2"
+        // join/mainTable?table2="LEFT JOIN table2 ON column1=column2"
         matcher.addURI(authority, "join/*", JOIN);
         return matcher;
     }
@@ -114,7 +114,7 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     }
 
     private void notifyUri(Uri uri) {
-        if (getContext() != null) {
+        if (getContext() != null && LikeOrmUriHelper.shouldNotify(uri)) {
             getContext().getContentResolver().notifyChange(uri, null);
         }
     }

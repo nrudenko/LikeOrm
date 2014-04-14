@@ -13,7 +13,7 @@ public class MetaDataParser {
     static <T> T getMetaData(Context context, String name) {
         try {
             ApplicationInfo info = context.getPackageManager().getApplicationInfo(context.getPackageName(),
-                PackageManager.GET_META_DATA);
+                    PackageManager.GET_META_DATA);
             Bundle metaData = info.metaData;
             if (metaData != null)
                 return (T) metaData.get(name);
@@ -37,7 +37,7 @@ public class MetaDataParser {
     public static String getAuthority(Context context, Class<? extends ContentProvider> providerClass) {
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
-                PackageManager.GET_PROVIDERS);
+                    PackageManager.GET_PROVIDERS);
             ProviderInfo[] providers = packageInfo.providers;
             if (providers.length > 0) {
                 for (int i = 0; i < providers.length; i++) {
@@ -45,6 +45,23 @@ public class MetaDataParser {
                     if (provider.name.contains(providerClass.getSimpleName())) {
                         return provider.authority;
                     }
+                }
+            }
+        } catch (PackageManager.NameNotFoundException e) {
+            e.printStackTrace();
+        }
+        return null;
+    }
+
+    public static String getFirstAuthority(Context context) {
+        try {
+            PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
+                    PackageManager.GET_PROVIDERS);
+            ProviderInfo[] providers = packageInfo.providers;
+            if (providers.length > 0) {
+                for (int i = 0; i < providers.length; i++) {
+                    ProviderInfo provider = providers[i];
+                    return provider.authority;
                 }
             }
         } catch (PackageManager.NameNotFoundException e) {

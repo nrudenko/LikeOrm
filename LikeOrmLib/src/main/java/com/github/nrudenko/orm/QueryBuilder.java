@@ -22,8 +22,8 @@ import static com.github.nrudenko.orm.CursorUtil.objectToContentValues;
 
 public class QueryBuilder<T> {
 
+    private final LikeOrmUriHelper uriHelper;
     private String table;
-    private final Uri baseUri;
     private Uri uri;
     private String[] projection;
     private StringBuilder where = new StringBuilder();
@@ -33,24 +33,13 @@ public class QueryBuilder<T> {
     private String limit;
 
     public QueryBuilder(Context context, Class<? extends ContentProvider> providerClass) {
-        String authority = MetaDataParser.getAuthority(context, providerClass);
-        this.baseUri = Uri.parse("content://" + authority);
+        uriHelper = new LikeOrmUriHelper(context, providerClass);
         this.contentResolver = context.getContentResolver();
     }
 
     public QueryBuilder<T> table(Class<T> aClass, TableJoin... joins) {
         table = aClass.getSimpleName();
-        Uri.Builder uriBuilder = baseUri.buildUpon();
-        if (joins.length > 0) {
-            uriBuilder.appendPath("join").appendPath(table);
-            for (int i = 0; i < joins.length; i++) {
-                TableJoin join = joins[i];
-                uriBuilder.appendQueryParameter("join[" + i + "]", join.getSql());
-            }
-        } else {
-            uriBuilder.appendPath("table").appendPath(table);
-        }
-        uri = uriBuilder.build();
+        uri = uriHelper.getTableUri(table, joins);
         return this;
     }
 
@@ -248,6 +237,11 @@ public class QueryBuilder<T> {
                 .append(") AS ")
                 .append(column.getName());
         return new Column(raw.toString());
+    }
+
+    public QueryBuilder<T> withoutNotifying() {
+        uri = uri.buildUpon().appendQueryParameter(LikeOrmUriHelper.SHOULD_NOTIFY, Boolean.toString(false)).build();
+        return this;
     }
 
     class QueryLoader extends AsyncQueryHandler {
