@@ -22,29 +22,28 @@ import static com.github.nrudenko.orm.CursorUtil.objectToContentValues;
 
 public class QueryBuilder<T> {
 
-    private final LikeOrmUriHelper uriHelper;
+    private final LikeOrmUriHelper.Builder uriBuilder;
     private String table;
-    private Uri uri;
+    //    private Uri uri;
     private String[] projection;
     private StringBuilder where = new StringBuilder();
     private ArrayList<String> whereArgs = new ArrayList<String>();
     private StringBuilder orderBy = new StringBuilder();
-    private StringBuilder groupBy = new StringBuilder();
     private String limit;
 
     public QueryBuilder(Context context) {
-        uriHelper = new LikeOrmUriHelper(context);
+        uriBuilder = new LikeOrmUriHelper.Builder(context);
         this.contentResolver = context.getContentResolver();
     }
 
     public QueryBuilder(Context context, Class<? extends ContentProvider> providerClass) {
-        uriHelper = new LikeOrmUriHelper(context, providerClass);
+        uriBuilder = new LikeOrmUriHelper.Builder(context, providerClass);
         this.contentResolver = context.getContentResolver();
     }
 
     public QueryBuilder<T> table(Class<T> aClass, TableJoin... joins) {
         table = aClass.getSimpleName();
-        uri = uriHelper.getTableUri(table, joins);
+        uriBuilder.addTable(table, joins);
         return this;
     }
 
@@ -105,26 +104,18 @@ public class QueryBuilder<T> {
     }
 
     public QueryBuilder<T> orderBy(SortOrder... sortOrders) {
+        String[] orders = new String[sortOrders.length];
         for (int i = 0; i < sortOrders.length; i++) {
             SortOrder order = sortOrders[i];
-            orderBy.append(order.sql);
+            orders[i] = order.sql;
         }
+        orderBy.append(TextUtils.join(",", orders).toString());
         return this;
     }
 
     public QueryBuilder<T> groupBy(Column... columns) {
-        groupBy = new StringBuilder("GROUP BY ");
-        columnsNameJoin(columns);
-        return this;
-    }
-
-    public QueryBuilder limit(int count) {
-        limit = "LIMIT " + count;
-        return this;
-    }
-
-    private void columnsNameJoin(Column[] columns) {
         String comma = ",";
+        StringBuilder groupBy = new StringBuilder();
         boolean firstTime = true;
         for (Column column : columns) {
             if (firstTime) {
@@ -134,6 +125,13 @@ public class QueryBuilder<T> {
             }
             groupBy.append(column.getName());
         }
+        uriBuilder.addGroupBy(groupBy.toString());
+        return this;
+    }
+
+    public QueryBuilder limit(int count) {
+        limit = "LIMIT " + count;
+        return this;
     }
 
     public static String preparePlaceHolders(int count) {
@@ -145,7 +143,7 @@ public class QueryBuilder<T> {
     }
 
     public Cursor query() {
-        return contentResolver.query(uri, projection, getWhere(), getWhereArgs(), getOrderBy());
+        return contentResolver.query(getUri(), projection, getWhere(), getWhereArgs(), getOrderBy());
     }
 
     public void query(OnOperationFinishedListener loadFinishedListener) {
@@ -153,11 +151,11 @@ public class QueryBuilder<T> {
     }
 
     public Uri insert(T object) {
-        return this.contentResolver.insert(uri, objectToContentValues(object));
+        return this.contentResolver.insert(getUri(), objectToContentValues(object));
     }
 
     public int insert(List<T> objects) {
-        return contentResolver.bulkInsert(uri, objectToContentValues(objects));
+        return contentResolver.bulkInsert(getUri(), objectToContentValues(objects));
     }
 
     public void insert(T object, OnOperationFinishedListener loadFinishedListener) {
@@ -182,7 +180,7 @@ public class QueryBuilder<T> {
     ///////////////////////////////////////////////////////////////////////////
 
     public Uri getUri() {
-        return uri;
+        return uriBuilder.build();
     }
 
     public String[] getProjection() {
@@ -192,11 +190,6 @@ public class QueryBuilder<T> {
     public String getWhere() {
         StringBuilder result = new StringBuilder();
         result.append(where);
-        if (groupBy.length() > 0) {
-            result
-                    .append(" ")
-                    .append(groupBy);
-        }
         return getStringOrNull(result);
     }
 
@@ -245,7 +238,7 @@ public class QueryBuilder<T> {
     }
 
     public QueryBuilder<T> withoutNotifying() {
-        uri = uri.buildUpon().appendQueryParameter(LikeOrmUriHelper.SHOULD_NOTIFY, Boolean.toString(false)).build();
+        uriBuilder.withoutNotify();
         return this;
     }
 

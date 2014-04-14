@@ -9,6 +9,8 @@ import android.database.sqlite.SQLiteDatabase;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.github.nrudenko.orm.sql.TableJoin;
+
 import java.util.Iterator;
 import java.util.List;
 import java.util.Set;
@@ -41,12 +43,14 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
         final SQLiteDatabase db = getDbHelper().getReadableDatabase();
         String table = getTable(uri);
+        String groupBy = LikeOrmUriHelper.getGroupBy(uri);
+        String having = null;
 
         Cursor cursor = null;
         switch (uriMatcher.match(uri)) {
             case SINGLE_TABLE:
             case JOIN:
-                cursor = db.query(table, projection, selection, selectionArgs, null, null, sortOrder);
+                cursor = db.query(table, projection, selection, selectionArgs, groupBy, having, sortOrder);
                 break;
         }
 
@@ -120,27 +124,22 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     }
 
     private String getTable(Uri uri) {
-        String tableName;
         List<String> segments = uri.getPathSegments();
+        StringBuilder table = new StringBuilder(segments.get(segments.size() - 1));
         switch (uriMatcher.match(uri)) {
             case SINGLE_TABLE:
-                tableName = segments.get(segments.size() - 1);
+                // in all cases
                 break;
             case JOIN:
-                StringBuilder table = new StringBuilder(segments.get(segments.size() - 1));
-                Set<String> queryParameterNames = uri.getQueryParameterNames();
-                Iterator<String> iterator = queryParameterNames.iterator();
-                while (iterator.hasNext()) {
-                    String key = iterator.next();
+                List<String> joins = LikeOrmUriHelper.getJoins(uri);
+                for (String join : joins) {
                     table.append(" ");
-                    table.append(uri.getQueryParameter(key));
+                    table.append(join);
                 }
-                tableName = table.toString();
                 break;
             default:
                 throw new RuntimeException("Can't find table from uri: " + uri);
         }
-        return tableName;
+        return table.toString();
     }
-
 }

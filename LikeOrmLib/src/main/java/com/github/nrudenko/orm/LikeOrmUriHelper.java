@@ -15,34 +15,72 @@ public class LikeOrmUriHelper {
 
     public static final String JOIN = "join";
     public static final String TABLE = "table";
-    public static final String SHOULD_NOTIFY = "should_notify";
-    private final Uri baseUri;
+    public static final String WITHOUT_NOTIFY = "without_notify";
+    public static final String GROUP_BY = "groupBy";
 
-    public LikeOrmUriHelper(Context context, Class<? extends ContentProvider> providerClass) {
-        String authority = MetaDataParser.getAuthority(context, providerClass);
-        this.baseUri = Uri.parse("content://" + authority);
-    }
+    public static class Builder {
+        private final Uri.Builder uriBuilder;
+        private final Uri baseUri;
 
-    public LikeOrmUriHelper(Context context) {
-        String authority = MetaDataParser.getFirstAuthority(context);
-        this.baseUri = Uri.parse("content://" + authority);
-    }
-
-    public Uri getTableUri(String mainTable, TableJoin... joins) {
-        Uri.Builder uriBuilder = baseUri.buildUpon();
-        if (joins.length > 0) {
-            uriBuilder.appendPath(JOIN).appendPath(mainTable);
-            for (int i = 0; i < joins.length; i++) {
-                TableJoin join = joins[i];
-                uriBuilder.appendQueryParameter(TABLE.concat(join.getCls().getSimpleName()), join.getSql());
-            }
-        } else {
-            uriBuilder.appendPath(TABLE).appendPath(mainTable);
+        public Builder(Context context, Class<? extends ContentProvider> providerClass) {
+            String authority = MetaDataParser.getAuthority(context, providerClass);
+            this.baseUri = Uri.parse("content://" + authority);
+            uriBuilder = baseUri.buildUpon();
         }
-        return uriBuilder.build();
+
+        public Builder(Context context) {
+            String authority = MetaDataParser.getFirstAuthority(context);
+            this.baseUri = Uri.parse("content://" + authority);
+            this.uriBuilder = baseUri.buildUpon();
+        }
+
+        public Builder addTable(String mainTable, TableJoin... joins) {
+            if (joins.length > 0) {
+                uriBuilder.appendPath(JOIN).appendPath(mainTable);
+                for (int i = 0; i < joins.length; i++) {
+                    TableJoin join = joins[i];
+                    uriBuilder.appendQueryParameter(TABLE.concat(join.getCls().getSimpleName()), join.getSql());
+                }
+            } else {
+                uriBuilder.appendPath(TABLE).appendPath(mainTable);
+            }
+            return this;
+        }
+
+        public Builder addGroupBy(String groupBy) {
+            uriBuilder.appendQueryParameter(GROUP_BY, groupBy);
+            return this;
+        }
+
+        public Builder addHaving() {
+            //TODO should be implement
+            return this;
+        }
+
+        public Builder withoutNotify() {
+            uriBuilder.appendQueryParameter(WITHOUT_NOTIFY, Boolean.TRUE.toString());
+            return this;
+        }
+
+        public Uri build() {
+            return uriBuilder.build();
+        }
     }
 
-    public List<String> getAllTables(Uri uri) {
+    public static List<String> getJoins(Uri uri) {
+        List<String> result = new ArrayList<String>();
+        Set<String> queryParameterNames = uri.getQueryParameterNames();
+        Iterator<String> iterator = queryParameterNames.iterator();
+        while (iterator.hasNext()) {
+            String param = iterator.next();
+            if (param.startsWith(TABLE)) {
+                result.add(uri.getQueryParameter(param));
+            }
+        }
+        return result;
+    }
+
+    public static List<String> getAllTables(Uri uri) {
         List<String> result = new ArrayList<String>();
 
         String mainTable = uri.getLastPathSegment();
@@ -60,10 +98,14 @@ public class LikeOrmUriHelper {
     }
 
     public static boolean shouldNotify(Uri uri) {
-        return uri.getBooleanQueryParameter(SHOULD_NOTIFY, true);
+        return uri.getBooleanQueryParameter(WITHOUT_NOTIFY, true);
     }
 
-    public boolean isJoinUri(Uri mainUri) {
-        return JOIN.equals(mainUri.getPathSegments().get(0));
+    public static boolean isJoinUri(Uri uri) {
+        return JOIN.equals(uri.getPathSegments().get(0));
+    }
+
+    public static String getGroupBy(Uri uri) {
+        return uri.getQueryParameter(GROUP_BY);
     }
 }
