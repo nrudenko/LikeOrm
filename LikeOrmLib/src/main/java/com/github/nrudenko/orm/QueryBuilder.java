@@ -32,6 +32,11 @@ public class QueryBuilder<T> {
     private StringBuilder groupBy = new StringBuilder();
     private String limit;
 
+    public QueryBuilder(Context context) {
+        uriHelper = new LikeOrmUriHelper(context);
+        this.contentResolver = context.getContentResolver();
+    }
+
     public QueryBuilder(Context context, Class<? extends ContentProvider> providerClass) {
         uriHelper = new LikeOrmUriHelper(context, providerClass);
         this.contentResolver = context.getContentResolver();
