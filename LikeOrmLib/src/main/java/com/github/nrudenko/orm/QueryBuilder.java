@@ -267,10 +267,24 @@ public class QueryBuilder<T> {
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
             onOperationFinishedListener.onLoadFinished(cursor);
         }
+
+        @Override
+        protected void onInsertComplete(int token, Object cookie, Uri uri) {
+            if (onOperationFinishedListener instanceof SimpleOnOperationFinishedListener)
+                ((SimpleOnOperationFinishedListener) onOperationFinishedListener).onInsertFinished();
+        }
     }
 
     public static interface OnOperationFinishedListener {
         public void onLoadFinished(Cursor cursor);
+    }
+
+    public static class SimpleOnOperationFinishedListener implements OnOperationFinishedListener {
+        public void onLoadFinished(Cursor cursor) {
+        }
+
+        public void onInsertFinished() {
+        }
     }
 
 }
