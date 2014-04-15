@@ -87,6 +87,12 @@ public class QueryBuilder<T> {
         return this;
     }
 
+    public QueryBuilder<T> isNot(Object value) {
+        updateWhere("<>?", value);
+        return this;
+    }
+
+
     public QueryBuilder<T> in(List<String> in) {
         where.append("IN (" + preparePlaceHolders(in.size()) + ")");
         whereArgs.addAll(in);
@@ -224,8 +230,14 @@ public class QueryBuilder<T> {
     private ContentResolver contentResolver;
 
     public String toRawQuery() {
+        String bindedWhere = getWhere();
+        String[] whereArgsForBind = getWhereArgs();
+        for (int i = 0; i < whereArgsForBind.length; i++) {
+            String arg = whereArgsForBind[i];
+            bindedWhere = bindedWhere.replaceFirst("\\?", arg);
+        }
         return SQLiteQueryBuilder.buildQueryString(
-                false, table, getProjection(), getWhere(), null, null, getOrderBy(), null);
+                false, table, getProjection(), bindedWhere, null, null, getOrderBy(), null);
     }
 
     public Column asColumn(Column column) {
