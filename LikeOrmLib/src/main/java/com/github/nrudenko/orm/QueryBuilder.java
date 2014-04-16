@@ -1,6 +1,5 @@
 package com.github.nrudenko.orm;
 
-import android.content.AsyncQueryHandler;
 import android.content.ContentProvider;
 import android.content.ContentResolver;
 import android.content.Context;
@@ -166,6 +165,10 @@ public class QueryBuilder<T> {
 
     public void insert(T object, OnFinishedListener loadFinishedListener) {
         new QueryLoader(contentResolver, loadFinishedListener).startInsert(0, null, getUri(), objectToContentValues(object));
+    }
+
+    public void insert(List<T> objects, OnFinishedListener loadFinishedListener) {
+        new QueryLoader(contentResolver, loadFinishedListener).startBulkInsert(0, null, getUri(), objectToContentValues(objects));
     }
 
     public int update(T object) {
