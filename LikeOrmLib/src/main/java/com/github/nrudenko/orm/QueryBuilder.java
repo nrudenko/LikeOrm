@@ -152,7 +152,7 @@ public class QueryBuilder<T> {
         return contentResolver.query(getUri(), projection, getWhere(), getWhereArgs(), getOrderBy());
     }
 
-    public void query(OnOperationFinishedListener loadFinishedListener) {
+    public void query(OnFinishedListener loadFinishedListener) {
         new QueryLoader(contentResolver, loadFinishedListener).startQuery(0, null, getUri(), getProjection(), getWhere(), getWhereArgs(), getOrderBy());
     }
 
@@ -164,7 +164,7 @@ public class QueryBuilder<T> {
         return contentResolver.bulkInsert(getUri(), objectToContentValues(objects));
     }
 
-    public void insert(T object, OnOperationFinishedListener loadFinishedListener) {
+    public void insert(T object, OnFinishedListener loadFinishedListener) {
         new QueryLoader(contentResolver, loadFinishedListener).startInsert(0, null, getUri(), objectToContentValues(object));
     }
 
@@ -172,7 +172,7 @@ public class QueryBuilder<T> {
         return contentResolver.update(getUri(), objectToContentValues(object), getWhere(), getWhereArgs());
     }
 
-    public void update(T object, OnOperationFinishedListener loadFinishedListener) {
+    public void update(T object, OnFinishedListener loadFinishedListener) {
         new QueryLoader(contentResolver, loadFinishedListener).startUpdate
                 (0, null, getUri(), objectToContentValues(object), getWhere(), getWhereArgs());
     }
@@ -256,31 +256,31 @@ public class QueryBuilder<T> {
 
     class QueryLoader extends AsyncQueryHandler {
 
-        private final OnOperationFinishedListener onOperationFinishedListener;
+        private final OnFinishedListener onFinishedListener;
 
-        public QueryLoader(ContentResolver cr, OnOperationFinishedListener onOperationFinishedListener) {
+        public QueryLoader(ContentResolver cr, OnFinishedListener onFinishedListener) {
             super(cr);
-            this.onOperationFinishedListener = onOperationFinishedListener;
+            this.onFinishedListener = onFinishedListener;
         }
 
         @Override
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            onOperationFinishedListener.onLoadFinished(cursor);
+            onFinishedListener.onQueryFinished(cursor);
         }
 
         @Override
         protected void onInsertComplete(int token, Object cookie, Uri uri) {
-            if (onOperationFinishedListener instanceof SimpleOnOperationFinishedListener)
-                ((SimpleOnOperationFinishedListener) onOperationFinishedListener).onInsertFinished();
+            if (onFinishedListener instanceof SimpleOnFinishedListener)
+                ((SimpleOnFinishedListener) onFinishedListener).onInsertFinished();
         }
     }
 
-    public static interface OnOperationFinishedListener {
-        public void onLoadFinished(Cursor cursor);
+    public static interface OnFinishedListener {
+        public void onQueryFinished(Cursor cursor);
     }
 
-    public static class SimpleOnOperationFinishedListener implements OnOperationFinishedListener {
-        public void onLoadFinished(Cursor cursor) {
+    public static class SimpleOnFinishedListener implements OnFinishedListener {
+        public void onQueryFinished(Cursor cursor) {
         }
 
         public void onInsertFinished() {
