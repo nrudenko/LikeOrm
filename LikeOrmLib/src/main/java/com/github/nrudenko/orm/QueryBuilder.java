@@ -93,10 +93,8 @@ public class QueryBuilder<T> {
 
 
     public QueryBuilder<T> in(List<String> in) {
-        if (!in.isEmpty()) {
-            where.append("IN (" + preparePlaceHolders(in.size()) + ")");
-            whereArgs.addAll(in);
-        }
+        where.append(" IN (" + preparePlaceHolders(in.size()) + ")");
+        whereArgs.addAll(in);
         return this;
     }
 
