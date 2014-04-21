@@ -268,13 +268,17 @@ public class QueryBuilder<T> {
 
         @Override
         protected void onQueryComplete(int token, Object cookie, Cursor cursor) {
-            onFinishedListener.onQueryFinished(cursor);
+            if (onFinishedListener != null) {
+                onFinishedListener.onQueryFinished(cursor);
+            }
         }
 
         @Override
         protected void onInsertComplete(int token, Object cookie, Uri uri) {
-            if (onFinishedListener instanceof SimpleOnFinishedListener)
-                ((SimpleOnFinishedListener) onFinishedListener).onInsertFinished();
+            if (onFinishedListener != null) {
+                if (onFinishedListener instanceof SimpleOnFinishedListener)
+                    ((SimpleOnFinishedListener) onFinishedListener).onInsertFinished();
+            }
         }
     }
 
