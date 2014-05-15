@@ -22,8 +22,20 @@ public abstract class LikeOrmSQLiteOpenHelper extends SQLiteOpenHelper {
 
     @Override
     public void onCreate(SQLiteDatabase db) {
+        createTables(db);
+    }
+
+    protected abstract void appendSchemes(List<Class> classes);
+
+    private List<Class> getSchemesClasses() {
         List<Class> classes = new ArrayList<Class>();
-        appendSchemas(classes);
+        appendSchemes(classes);
+        return classes;
+    }
+
+    protected void createTables(SQLiteDatabase db) {
+        List<Class> classes = getSchemesClasses();
+
         StringBuilder sql = new StringBuilder();
         for (int i = 0; i < classes.size(); i++) {
             Scheme scheme = new Scheme(classes.get(i));
@@ -33,7 +45,17 @@ public abstract class LikeOrmSQLiteOpenHelper extends SQLiteOpenHelper {
         }
     }
 
-    protected abstract void appendSchemas(List<Class> classes);
+    protected void dropTables(SQLiteDatabase db) {
+        List<Class> classes = getSchemesClasses();
+
+        StringBuilder sql = new StringBuilder();
+        for (int j = 0; j < classes.size(); j++) {
+            sql.setLength(0);
+            Class aClass = classes.get(j);
+            sql.append("DROP TABLE IF EXISTS ").append(aClass.getSimpleName()).append(";");
+            db.execSQL(sql.toString());
+        }
+    }
 
     protected boolean appendCreateTableSQL(StringBuilder sql, Scheme scheme) {
         sql.append("CREATE TABLE IF NOT EXISTS ").append(scheme.getTableName()).append(" (");
@@ -58,11 +80,12 @@ public abstract class LikeOrmSQLiteOpenHelper extends SQLiteOpenHelper {
         String customSql = scheme.getCustomSql();
         if (!TextUtils.isEmpty(customSql)) {
             sql
-                .append(" ")
-                .append(customSql);
+                    .append(" ")
+                    .append(customSql);
         }
         sql.append(");");
         Log.d(TAG, sql.toString());
         return false;
     }
+
 }
