@@ -72,6 +72,8 @@ public class CursorUtil {
                 FieldType fieldType;
                 if (field.isAnnotationPresent(DbColumn.class) && field.getAnnotation(DbColumn.class).type() != DbType.NO_TYPE) {
                     fieldType = FieldType.byDbType(field.getAnnotation(DbColumn.class).type());
+                } else if (field.isAnnotationPresent(VirtualColumn.class) && field.getAnnotation(VirtualColumn.class).type() != DbType.NO_TYPE) {
+                    fieldType = FieldType.byDbType(field.getAnnotation(VirtualColumn.class).type());
                 } else {
                     fieldType = FieldType.byTypeClass(type);
                 }
