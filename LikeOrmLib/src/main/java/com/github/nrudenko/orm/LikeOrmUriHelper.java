@@ -15,7 +15,7 @@ public class LikeOrmUriHelper {
 
     public static final String JOIN = "join";
     public static final String TABLE = "table";
-    public static final String WITHOUT_NOTIFY = "without_notify";
+    public static final String NOTIFY = "notify";
     public static final String GROUP_BY = "groupBy";
 
     public static class Builder {
@@ -58,7 +58,7 @@ public class LikeOrmUriHelper {
         }
 
         public Builder withoutNotify() {
-            uriBuilder.appendQueryParameter(WITHOUT_NOTIFY, Boolean.TRUE.toString());
+            uriBuilder.appendQueryParameter(NOTIFY, Boolean.FALSE.toString());
             return this;
         }
 
@@ -98,7 +98,7 @@ public class LikeOrmUriHelper {
     }
 
     public static boolean shouldNotify(Uri uri) {
-        return uri.getBooleanQueryParameter(WITHOUT_NOTIFY, true);
+        return uri.getBooleanQueryParameter(NOTIFY, true);
     }
 
     public static boolean isJoinUri(Uri uri) {
