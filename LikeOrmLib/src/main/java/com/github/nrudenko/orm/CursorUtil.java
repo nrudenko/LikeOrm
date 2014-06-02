@@ -34,8 +34,8 @@ public class CursorUtil {
         return buildModel(modelClass, cursor);
     }
 
-    public static <T> List<T> cursorToList(Cursor cursor, Class<T> modelClass) {
-        List<T> items = new ArrayList<T>();
+    public static <T> ArrayList<T> cursorToList(Cursor cursor, Class<T> modelClass) {
+        ArrayList<T> items = new ArrayList<T>();
         while (cursor.moveToNext()) {
             final T model = buildModel(modelClass, cursor);
             items.add(model);
