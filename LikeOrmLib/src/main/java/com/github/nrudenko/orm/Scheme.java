@@ -31,7 +31,7 @@ public class Scheme {
         for (int i = 0; i < classFields.size(); i++) {
             Field field = classFields.get(i);
             Column column = ReflectionUtils.fieldToColumn(field);
-            if (column != null) {
+            if (column != null && column.isCorrect()) {
                 result.add(column);
             }
         }

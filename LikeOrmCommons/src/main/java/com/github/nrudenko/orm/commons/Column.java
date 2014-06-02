@@ -49,13 +49,13 @@ public class Column {
 
         StringBuilder columnsSql = new StringBuilder(getName());
         columnsSql
-                .append(" ")
-                .append(type.getSqlRep());
+            .append(" ")
+            .append(type.getSqlRep());
 
         if (customAdditional != null) {
             columnsSql
-                    .append(" ")
-                    .append(customAdditional);
+                .append(" ")
+                .append(customAdditional);
         }
         return columnsSql.toString();
     }
@@ -64,12 +64,16 @@ public class Column {
         return new Column(getName() + " AS " + column.getName());
     }
 
+    public boolean isCorrect() {
+        return name != null && name.length() > 0 && type != null && type != DbType.NO_TYPE;
+    }
+
     @Override
     public String toString() {
         return "Column{" +
-                "name='" + name + '\'' +
-                ", type=" + type +
-                ", customAdditional='" + customAdditional + '\'' +
-                '}';
+            "name='" + name + '\'' +
+            ", type=" + type +
+            ", customAdditional='" + customAdditional + '\'' +
+            '}';
     }
 }
