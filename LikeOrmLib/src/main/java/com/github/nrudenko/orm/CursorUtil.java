@@ -171,7 +171,7 @@ public class CursorUtil {
         return model;
     }
 
-    public static ContentValues[] objectToContentValues(List items) {
+    public static ContentValues[] listToContentValuesArray(List items) {
         ContentValues[] contentValues = new ContentValues[items.size()];
         // TODO sync for items?
         for (int i = 0; i < items.size(); i++) {

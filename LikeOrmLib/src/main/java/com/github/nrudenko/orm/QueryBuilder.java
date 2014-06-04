@@ -14,6 +14,7 @@ import com.github.nrudenko.orm.sql.SortOrder;
 import com.github.nrudenko.orm.sql.TableJoin;
 
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 
 import static com.github.nrudenko.orm.CursorUtil.objectToContentValues;
@@ -81,8 +82,8 @@ public class QueryBuilder<T> {
 
     public QueryBuilder<T> is(Column column) {
         where
-                .append("=")
-                .append(column.getName());
+            .append("=")
+            .append(column.getName());
         return this;
     }
 
@@ -155,12 +156,20 @@ public class QueryBuilder<T> {
         new QueryLoader(contentResolver, loadFinishedListener).startQuery(0, null, getUri(), getProjection(), getWhere(), getWhereArgs(), getOrderBy());
     }
 
+    ///////////////////////////////////////////////////////////////////////////
+    // insert
+    ///////////////////////////////////////////////////////////////////////////
+
     public Uri insert(T object) {
         return this.contentResolver.insert(getUri(), objectToContentValues(object));
     }
 
     public int insert(List<T> objects) {
-        return contentResolver.bulkInsert(getUri(), objectToContentValues(objects));
+        return contentResolver.bulkInsert(getUri(), CursorUtil.listToContentValuesArray(objects));
+    }
+
+    public int insert(T[] objects) {
+        return contentResolver.bulkInsert(getUri(), CursorUtil.listToContentValuesArray(Arrays.asList(objects)));
     }
 
     public void insert(T object, OnFinishedListener loadFinishedListener) {
@@ -168,8 +177,16 @@ public class QueryBuilder<T> {
     }
 
     public void insert(List<T> objects, OnFinishedListener loadFinishedListener) {
-        new QueryLoader(contentResolver, loadFinishedListener).startBulkInsert(0, null, getUri(), objectToContentValues(objects));
+        new QueryLoader(contentResolver, loadFinishedListener).startBulkInsert(0, null, getUri(), CursorUtil.listToContentValuesArray(objects));
     }
+
+    public void insert(T[] object, OnFinishedListener loadFinishedListener) {
+        new QueryLoader(contentResolver, loadFinishedListener).startInsert(0, null, getUri(), objectToContentValues(object));
+    }
+
+    ///////////////////////////////////////////////////////////////////////////
+    // update
+    ///////////////////////////////////////////////////////////////////////////
 
     public int update(T object) {
         return contentResolver.update(getUri(), objectToContentValues(object), getWhere(), getWhereArgs());
@@ -177,11 +194,16 @@ public class QueryBuilder<T> {
 
     public void update(T object, OnFinishedListener loadFinishedListener) {
         new QueryLoader(contentResolver, loadFinishedListener).startUpdate
-                (0, null, getUri(), objectToContentValues(object), getWhere(), getWhereArgs());
+            (0, null, getUri(), objectToContentValues(object), getWhere(), getWhereArgs());
     }
 
     public int delete() {
         return contentResolver.delete(getUri(), getWhere(), getWhereArgs());
+    }
+
+    public void delete(OnFinishedListener loadFinishedListener) {
+        new QueryLoader(contentResolver, loadFinishedListener)
+                .startDelete(0, null, getUri(), getWhere(), getWhereArgs());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -217,8 +239,8 @@ public class QueryBuilder<T> {
                 result.append(new ASC(Scheme._ID).sql); // default is asc by _id
             }
             result
-                    .append(" ")
-                    .append(limit);
+                .append(" ")
+                .append(limit);
         }
         return getStringOrNull(result);
     }
@@ -240,15 +262,15 @@ public class QueryBuilder<T> {
             bindedWhere = bindedWhere.replaceFirst("\\?", arg);
         }
         return SQLiteQueryBuilder.buildQueryString(
-                false, table, getProjection(), bindedWhere, null, null, getOrderBy(), null);
+            false, table, getProjection(), bindedWhere, null, null, getOrderBy(), null);
     }
 
     public Column asColumn(Column column) {
         StringBuilder raw = new StringBuilder("(");
         raw
-                .append(toRawQuery())
-                .append(") AS ")
-                .append(column.getName());
+            .append(toRawQuery())
+            .append(") AS ")
+            .append(column.getName());
         return new Column(raw.toString());
     }
 
