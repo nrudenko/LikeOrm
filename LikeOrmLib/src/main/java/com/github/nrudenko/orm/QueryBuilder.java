@@ -100,7 +100,9 @@ public class QueryBuilder<T> {
     }
 
     private void updateWhere(String operation, Object value) {
-        if (value instanceof Boolean) {
+        if (value == null) {
+            whereArgs.add("NULL");
+        } else if (value instanceof Boolean) {
             String booleanVal = (Boolean) value ? "1" : "0";
             whereArgs.add(booleanVal);
         } else {
@@ -203,7 +205,7 @@ public class QueryBuilder<T> {
 
     public void delete(OnFinishedListener loadFinishedListener) {
         new QueryLoader(contentResolver, loadFinishedListener)
-                .startDelete(0, null, getUri(), getWhere(), getWhereArgs());
+            .startDelete(0, null, getUri(), getWhere(), getWhereArgs());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -302,6 +304,14 @@ public class QueryBuilder<T> {
                     ((SimpleOnFinishedListener) onFinishedListener).onInsertFinished();
             }
         }
+
+        @Override
+        protected void onDeleteComplete(int token, Object cookie, int result) {
+            if (onFinishedListener != null) {
+                if (onFinishedListener instanceof SimpleOnFinishedListener)
+                    ((SimpleOnFinishedListener) onFinishedListener).onDeleteFinished();
+            }
+        }
     }
 
     public static interface OnFinishedListener {
@@ -313,6 +323,9 @@ public class QueryBuilder<T> {
         }
 
         public void onInsertFinished() {
+        }
+
+        public void onDeleteFinished() {
         }
     }
 
