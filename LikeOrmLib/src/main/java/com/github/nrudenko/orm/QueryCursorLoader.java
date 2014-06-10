@@ -33,11 +33,11 @@ public class QueryCursorLoader extends CursorLoader {
     }
 
     @Override
-    protected void onStopLoading() {
-        super.onStopLoading();
+    protected void onReset() {
         if (notifyFromAllTables) {
             unregisterJoinObserver();
         }
+        super.onReset();
     }
 
     private void registerJoinObserver(Context context, final Uri mainUri) {
