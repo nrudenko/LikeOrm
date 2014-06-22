@@ -56,6 +56,7 @@ public class LikeOrmTestCase extends AndroidTestCase {
         mMockContext = new MockContext3();
     }
 
+
     class MockContext3 extends MockContext {
 
         @Override
@@ -74,7 +75,17 @@ public class LikeOrmTestCase extends AndroidTestCase {
 
                 @Override
                 public Cursor query(Uri uri, String[] projection, String selection, String[] selectionArgs, String sortOrder) {
-                    return new MockCursor();
+                    return new MockCursor(){
+                        @Override
+                        public boolean moveToNext() {
+                            return false;
+                        }
+
+                        @Override
+                        public int getCount() {
+                            return 0;
+                        }
+                    };
                 }
 
                 @Override
