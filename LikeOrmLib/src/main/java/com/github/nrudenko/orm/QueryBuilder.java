@@ -58,7 +58,7 @@ public class QueryBuilder<T> {
     }
 
     public QueryBuilder<T> where(Column column) {
-        if (where.length() > 0) {
+        if (where.length() > 0 && !where.toString().endsWith(" OR ")) {
             where.append(" AND ");
         }
         where.append(column.getName());
@@ -109,6 +109,11 @@ public class QueryBuilder<T> {
             whereArgs.add(value.toString());
         }
         where.append(operation);
+    }
+
+    public QueryBuilder or() {
+        where.append(" OR ");
+        return this;
     }
 
     public QueryBuilder<T> orderBy(SortOrder... sortOrders) {
@@ -222,7 +227,20 @@ public class QueryBuilder<T> {
 
     public String getWhere() {
         StringBuilder result = new StringBuilder();
-        result.append(where);
+        String[] wheres = where.toString().split(" OR ");
+        if (wheres.length > 1) {
+            for (int i = 0; i < wheres.length; i++) {
+                String s = wheres[i];
+                result.append("(");
+                result.append(s);
+                result.append(")");
+                if (i < wheres.length - 1) {
+                    result.append("OR");
+                }
+            }
+        } else {
+            result.append(where);
+        }
         return getStringOrNull(result);
     }
 
@@ -264,7 +282,8 @@ public class QueryBuilder<T> {
             bindedWhere = bindedWhere.replaceFirst("\\?", arg);
         }
         return SQLiteQueryBuilder.buildQueryString(
-            false, table, getProjection(), bindedWhere, null, null, getOrderBy(), null);
+            false, table, getProjection(), bindedWhere, null, null, getOrderBy(), null
+        );
     }
 
     public Column asColumn(Column column) {
@@ -315,10 +334,12 @@ public class QueryBuilder<T> {
     }
 
     public static interface OnFinishedListener {
+
         public void onQueryFinished(Cursor cursor);
     }
 
     public static class SimpleOnFinishedListener implements OnFinishedListener {
+
         public void onQueryFinished(Cursor cursor) {
         }
 
@@ -328,5 +349,4 @@ public class QueryBuilder<T> {
         public void onDeleteFinished() {
         }
     }
-
 }
