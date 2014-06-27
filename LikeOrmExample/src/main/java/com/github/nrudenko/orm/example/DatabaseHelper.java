@@ -3,14 +3,12 @@ package com.github.nrudenko.orm.example;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
-import com.github.nrudenko.orm.BaseSQLiteOpenHelper;
+import com.github.nrudenko.orm.LikeOrmSQLiteOpenHelper;
 import com.github.nrudenko.orm.example.model.Attach;
-import com.github.nrudenko.orm.example.model.ExampleModel;
-import com.github.nrudenko.orm.example.model.Message;
 
 import java.util.List;
 
-public class DatabaseHelper extends BaseSQLiteOpenHelper {
+public class DatabaseHelper extends LikeOrmSQLiteOpenHelper {
 
     public static final String CONTENT_AUTHORITY = "com.githab.nrudenko.orm";
 
@@ -31,7 +29,7 @@ public class DatabaseHelper extends BaseSQLiteOpenHelper {
     }
 
     @Override
-    protected void appendSchemas(List<Class> classes) {
+    protected void appendSchemes(List<Class> classes) {
 //        classes.add(Message.class);
 //        classes.add(ExampleModel.class);
         classes.add(Attach.class);

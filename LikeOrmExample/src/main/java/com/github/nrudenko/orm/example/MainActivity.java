@@ -7,7 +7,7 @@ import android.view.MenuItem;
 
 import com.githab.nrudenko.orm.example.R;
 import com.github.nrudenko.orm.CursorUtil;
-import com.github.nrudenko.orm.OrmUri;
+import com.github.nrudenko.orm.QueryBuilder;
 import com.github.nrudenko.orm.example.model.Attach;
 import com.github.nrudenko.orm.example.model.ExampleModel;
 
@@ -28,7 +28,9 @@ public class MainActivity extends ActionBarActivity {
         exampleModel.setDate(new Date());
         exampleModel.setText("text");
         exampleModel.setIntVal(1);
-        getContentResolver().insert(OrmUri.get(ExampleModel.class), CursorUtil.objectToContentValues(exampleModel));
+        new QueryBuilder<ExampleModel>(this, SimpleContentProvider.class)
+                .table(ExampleModel.class)
+                .insert(exampleModel);
     }
 
     private void update() {

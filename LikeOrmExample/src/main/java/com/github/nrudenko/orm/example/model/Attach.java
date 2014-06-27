@@ -1,11 +1,13 @@
 package com.github.nrudenko.orm.example.model;
 
+import com.github.nrudenko.orm.annotation.DbColumn;
 import com.github.nrudenko.orm.annotation.Table;
 
 @Table
-public class Attach extends BaseModel {
+public class Attach {
 
     String url;
+    @DbColumn(additional = "UNIQUE ON CONFLICT REPLACE")
     String messageId;
 
     public String getUrl() {

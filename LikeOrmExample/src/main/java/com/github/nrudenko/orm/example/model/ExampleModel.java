@@ -5,7 +5,7 @@ import com.github.nrudenko.orm.annotation.Table;
 import java.util.Date;
 
 @Table
-public class ExampleModel extends BaseModel {
+public class ExampleModel {
 
     String text;
     Date date;
