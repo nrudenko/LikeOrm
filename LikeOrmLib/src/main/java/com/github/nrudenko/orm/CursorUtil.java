@@ -9,16 +9,10 @@ import com.github.nrudenko.orm.adapter.BLOBAdapter;
 import com.github.nrudenko.orm.adapter.SerializeAdapter;
 import com.github.nrudenko.orm.annotation.DbColumn;
 import com.github.nrudenko.orm.annotation.DbSkipField;
-import com.github.nrudenko.orm.annotation.SerializeType;
 import com.github.nrudenko.orm.annotation.VirtualColumn;
 import com.github.nrudenko.orm.commons.DbType;
 import com.github.nrudenko.orm.commons.FieldType;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -113,16 +107,18 @@ public class CursorUtil {
                             break;
                         case SERIALIZED:
                             if (Serializable.class.isAssignableFrom(field.getType())) {
-                                if (field.isAnnotationPresent(SerializeType.class)) {
-                                    Class serializeAdapterClass = field.getAnnotation(SerializeType.class).adapter();
-                                    try {
-                                        SerializeAdapter serializeAdapter = (SerializeAdapter) serializeAdapterClass.newInstance();
-                                        Object object = serializeAdapter.deserialize(cursor, columnIndex, modelClass);
-                                        if (object != null) {
-                                            field.set(model, object);
+                                if (field.isAnnotationPresent(DbColumn.class)) {
+                                    Class serializeAdapterClass = field.getAnnotation(DbColumn.class).adapter();
+                                    if (serializeAdapterClass != null) {
+                                        try {
+                                            SerializeAdapter serializeAdapter = (SerializeAdapter) serializeAdapterClass.newInstance();
+                                            Object object = serializeAdapter.deserialize(cursor, columnIndex, modelClass);
+                                            if (object != null) {
+                                                field.set(model, object);
+                                            }
+                                        } catch (InstantiationException e) {
+                                            e.printStackTrace();
                                         }
-                                    } catch (InstantiationException e) {
-                                        e.printStackTrace();
                                     }
                                 }
                             } else {
@@ -226,20 +222,22 @@ public class CursorUtil {
                             break;
                         case SERIALIZED:
                             if (Serializable.class.isAssignableFrom(field.getType())) {
-                                if (field.isAnnotationPresent(SerializeType.class)) {
-                                    Class serializeAdapterClass = field.getAnnotation(SerializeType.class).adapter();
-                                    try {
-                                        SerializeAdapter serializeAdapter = (SerializeAdapter) serializeAdapterClass.newInstance();
-                                        Object object = serializeAdapter.serialize(value);
-                                        if (object != null) {
-                                            if (serializeAdapter instanceof BLOBAdapter) {
-                                                contentValues.put(fieldName, (byte[]) object);
-                                            } else {
-                                                contentValues.put(fieldName, (String) object);
+                                if (field.isAnnotationPresent(DbColumn.class)) {
+                                    Class serializeAdapterClass = field.getAnnotation(DbColumn.class).adapter();
+                                    if (serializeAdapterClass != null) {
+                                        try {
+                                            SerializeAdapter serializeAdapter = (SerializeAdapter) serializeAdapterClass.newInstance();
+                                            Object object = serializeAdapter.serialize(value);
+                                            if (object != null) {
+                                                if (serializeAdapter instanceof BLOBAdapter) {
+                                                    contentValues.put(fieldName, (byte[]) object);
+                                                } else {
+                                                    contentValues.put(fieldName, (String) object);
+                                                }
                                             }
+                                        } catch (InstantiationException e) {
+                                            e.printStackTrace();
                                         }
-                                    } catch (InstantiationException e) {
-                                        e.printStackTrace();
                                     }
                                 }
                             } else {

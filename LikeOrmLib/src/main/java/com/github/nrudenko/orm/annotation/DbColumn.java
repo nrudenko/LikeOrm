@@ -1,5 +1,6 @@
 package com.github.nrudenko.orm.annotation;
 
+import com.github.nrudenko.orm.adapter.BLOBAdapter;
 import com.github.nrudenko.orm.commons.DbType;
 
 import java.lang.annotation.ElementType;
@@ -16,4 +17,6 @@ public @interface DbColumn {
     public DbType type() default DbType.NO_TYPE;
 
     public String additional() default "";
+
+    public Class adapter() default BLOBAdapter.class;
 }

@@ -1,8 +1,9 @@
 package com.github.nrudenko.orm.example.model;
 
 import com.github.nrudenko.orm.adapter.BLOBAdapter;
-import com.github.nrudenko.orm.annotation.SerializeType;
+import com.github.nrudenko.orm.annotation.DbColumn;
 import com.github.nrudenko.orm.annotation.Table;
+import com.github.nrudenko.orm.commons.DbType;
 import com.github.nrudenko.orm.example.adapter.StringSerializeAdapter;
 
 import java.util.Date;
@@ -12,9 +13,9 @@ public class Message {
 
     String text;
     Date date;
-    @SerializeType(adapter = BLOBAdapter.class)
+    @DbColumn(type = DbType.SERIALIZED, adapter = BLOBAdapter.class)
     Audio audio;
-    @SerializeType(adapter = StringSerializeAdapter.class)
+    @DbColumn(type = DbType.SERIALIZED, adapter = StringSerializeAdapter.class)
     Image image;
 
     public String getText() {
