@@ -28,19 +28,29 @@ public class CursorUtil {
     }
 
     public static <T> T cursorToObject(Cursor cursor, Class<T> modelClass) {
-        if (cursor.getCount() == 0) {
-            return null;
-        }
+        if (isCursorEmpty(cursor)) return null;
+        return innerCursorToObject(cursor, modelClass);
+    }
+
+    private static <T> T innerCursorToObject(Cursor cursor, Class<T> modelClass) {
         return buildModel(modelClass, cursor);
     }
 
     public static <T> ArrayList<T> cursorToList(Cursor cursor, Class<T> modelClass) {
-        ArrayList<T> items = new ArrayList<T>();
+        if (isCursorEmpty(cursor)) return null;
+        ArrayList<T> items = new ArrayList<>();
         while (cursor.moveToNext()) {
             final T model = buildModel(modelClass, cursor);
             items.add(model);
         }
         return items;
+    }
+
+    public static boolean isCursorEmpty(Cursor cursor) {
+        if (cursor == null || cursor.getCount() == 0) {
+            return true;
+        }
+        return false;
     }
 
     private static <T> T buildModel(Class<T> modelClass, Cursor cursor) {

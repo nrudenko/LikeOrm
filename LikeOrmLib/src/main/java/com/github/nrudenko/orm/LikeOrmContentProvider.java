@@ -6,16 +6,15 @@ import android.content.ContentValues;
 import android.content.UriMatcher;
 import android.database.Cursor;
 import android.database.sqlite.SQLiteDatabase;
+import android.database.sqlite.SQLiteException;
 import android.net.Uri;
-import android.text.TextUtils;
+import android.util.Log;
 
-import com.github.nrudenko.orm.sql.TableJoin;
-
-import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 public abstract class LikeOrmContentProvider extends ContentProvider {
+
+    private static final String TAG = LikeOrmContentProvider.class.getSimpleName();
 
     public static final int SINGLE_TABLE = 100;
     private static final int JOIN = 101;
@@ -110,11 +109,17 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
     public int delete(Uri uri, String selection, String[] selectionArgs) {
         final SQLiteDatabase db = getDbHelper().getWritableDatabase();
         String table = getTable(uri);
-        int deleteResult = db.delete(table, selection, selectionArgs);
-        if (deleteResult > 0) {
-            notifyUri(uri);
+        int deleteResult = -1;
+        try {
+            deleteResult = db.delete(table, selection, selectionArgs);
+            if (deleteResult > 0) {
+                notifyUri(uri);
+            }
+        } catch (SQLiteException e) {
+            Log.w(TAG, e.toString());
+        } finally {
+            return deleteResult;
         }
-        return deleteResult;
     }
 
     private void notifyUri(Uri uri) {
@@ -142,4 +147,5 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
         }
         return table.toString();
     }
+
 }
