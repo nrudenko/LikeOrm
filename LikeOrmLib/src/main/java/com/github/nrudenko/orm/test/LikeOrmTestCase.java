@@ -85,6 +85,9 @@ public class LikeOrmTestCase extends AndroidTestCase {
                         public int getCount() {
                             return 0;
                         }
+
+                        @Override
+                        public void close() { }
                     };
                 }
 
