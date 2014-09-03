@@ -8,6 +8,7 @@ import java.lang.reflect.Field;
 import java.util.ArrayList;
 
 public class Scheme {
+
     final Table table;
     final Class<?> modelClass;
 
@@ -26,14 +27,20 @@ public class Scheme {
 
     public ArrayList<Column> getColumns() {
         ArrayList<Column> result = new ArrayList<Column>();
-        result.add(_ID);
         ArrayList<Field> classFields = ReflectionUtils.getClassFields(modelClass);
+        boolean hasId = false;
         for (int i = 0; i < classFields.size(); i++) {
             Field field = classFields.get(i);
+            if (_ID.getName().equals(field.getName())) {
+                hasId = true;
+            }
             Column column = ReflectionUtils.fieldToColumn(field);
             if (column != null && column.isCorrect()) {
                 result.add(column);
             }
+        }
+        if (!hasId) {
+            result.add(_ID);
         }
         return result;
     }
