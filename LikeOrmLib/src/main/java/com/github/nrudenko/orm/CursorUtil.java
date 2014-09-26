@@ -2,6 +2,7 @@ package com.github.nrudenko.orm;
 
 import android.content.ContentValues;
 import android.database.Cursor;
+import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
@@ -48,10 +49,7 @@ public class CursorUtil {
     }
 
     public static boolean isCursorEmpty(Cursor cursor) {
-        if (cursor == null || cursor.getCount() == 0) {
-            return true;
-        }
-        return false;
+        return cursor == null || cursor.getCount() == 0;
     }
 
     private static <T> T buildModel(Class<T> modelClass, Cursor cursor) {
@@ -286,5 +284,18 @@ public class CursorUtil {
             }
         }
         return contentValues;
+    }
+
+    /**
+     * Close cursor if it's not <code>null</code>.
+     * @return <code>true</code> if closed, <code>false</code> if was <code>null</code>
+     */
+    public static boolean closeSafely(@Nullable Cursor cursor) {
+        if (cursor == null) {
+            return false;
+        } else {
+            cursor.close();
+            return true;
+        }
     }
 }
