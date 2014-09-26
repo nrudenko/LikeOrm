@@ -318,22 +318,27 @@ public class QueryBuilder<T> {
 
         @Override
         protected void onInsertComplete(int token, Object cookie, Uri uri) {
-            if (onFinishedListener != null) {
-                if (onFinishedListener instanceof SimpleOnFinishedListener)
-                    ((SimpleOnFinishedListener) onFinishedListener).onInsertFinished();
+            if (onFinishedListener != null && onFinishedListener instanceof SimpleOnFinishedListener) {
+                ((SimpleOnFinishedListener) onFinishedListener).onInsertFinished();
+            }
+        }
+
+        @Override
+        protected void onUpdateComplete(int token, Object cookie, int result) {
+            if (onFinishedListener != null && onFinishedListener instanceof SimpleOnFinishedListener) {
+                ((SimpleOnFinishedListener) onFinishedListener).onUpdateFinished();
             }
         }
 
         @Override
         protected void onDeleteComplete(int token, Object cookie, int result) {
-            if (onFinishedListener != null) {
-                if (onFinishedListener instanceof SimpleOnFinishedListener)
-                    ((SimpleOnFinishedListener) onFinishedListener).onDeleteFinished();
+            if (onFinishedListener != null && onFinishedListener instanceof SimpleOnFinishedListener) {
+                ((SimpleOnFinishedListener) onFinishedListener).onDeleteFinished();
             }
         }
     }
 
-    public static interface OnFinishedListener {
+    public interface OnFinishedListener {
 
         public void onQueryFinished(Cursor cursor);
     }
@@ -344,6 +349,9 @@ public class QueryBuilder<T> {
         }
 
         public void onInsertFinished() {
+        }
+
+        public void onUpdateFinished() {
         }
 
         public void onDeleteFinished() {
