@@ -87,6 +87,16 @@ public class QueryBuilder<T> {
         return this;
     }
 
+    public QueryBuilder<T> isNull() {
+        where.append(" is null");
+        return this;
+    }
+
+    public QueryBuilder<T> isNotNull() {
+        where.append(" is not null");
+        return this;
+    }
+
     public QueryBuilder<T> isNot(Object value) {
         updateWhere("<>?", value);
         return this;
