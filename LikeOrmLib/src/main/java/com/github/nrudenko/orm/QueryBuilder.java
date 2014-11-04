@@ -236,22 +236,35 @@ public class QueryBuilder<T> {
     }
 
     public String getWhere() {
-        StringBuilder result = new StringBuilder();
-        String[] wheres = where.toString().split(" OR ");
-        if (wheres.length > 1) {
-            for (int i = 0; i < wheres.length; i++) {
-                String s = wheres[i];
-                result.append("(");
-                result.append(s);
-                result.append(")");
-                if (i < wheres.length - 1) {
-                    result.append("OR");
+        if (where == null || where.length() == 0)
+            return null;
+        return shieldWithBrackets(where.toString(), " AND ", " OR ");
+    }
+
+    private String shieldWithBrackets(String what, String... conditions) {
+        StringBuilder results = new StringBuilder();
+        String currentCondition = conditions[0];
+        String[] splits = what.split(currentCondition);
+        if (splits.length > 1) {
+            for (int j = 0; j < splits.length; j++) {
+                String split = splits[j];
+                results.append("(");
+                if (conditions.length == 1) {
+                    results.append(split);
+                } else {
+                    String[] leftConditions = new String[conditions.length - 1];
+                    System.arraycopy(conditions, 1, leftConditions, 0, conditions.length - 1);
+                    results.append(shieldWithBrackets(split, leftConditions));
+                }
+                results.append(")");
+                if (j < splits.length - 1) {
+                    results.append(currentCondition);
                 }
             }
+            return results.toString();
         } else {
-            result.append(where);
+            return what;
         }
-        return getStringOrNull(result);
     }
 
     public String[] getWhereArgs() {
