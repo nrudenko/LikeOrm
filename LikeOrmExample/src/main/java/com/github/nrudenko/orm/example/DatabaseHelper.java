@@ -5,6 +5,8 @@ import android.database.sqlite.SQLiteDatabase;
 
 import com.github.nrudenko.orm.LikeOrmSQLiteOpenHelper;
 import com.github.nrudenko.orm.example.model.Attach;
+import com.github.nrudenko.orm.example.model.ExampleModel;
+import com.github.nrudenko.orm.example.model.Message;
 
 import java.util.List;
 
@@ -30,8 +32,8 @@ public class DatabaseHelper extends LikeOrmSQLiteOpenHelper {
 
     @Override
     protected void appendSchemes(List<Class> classes) {
-//        classes.add(Message.class);
-//        classes.add(ExampleModel.class);
+        classes.add(Message.class);
+        classes.add(ExampleModel.class);
         classes.add(Attach.class);
     }
 

@@ -6,17 +6,14 @@ import android.support.annotation.Nullable;
 import android.text.TextUtils;
 import android.util.Log;
 
+import com.github.nrudenko.orm.adapter.BLOBAdapter;
+import com.github.nrudenko.orm.adapter.SerializeAdapter;
 import com.github.nrudenko.orm.annotation.DbColumn;
 import com.github.nrudenko.orm.annotation.DbSkipField;
 import com.github.nrudenko.orm.annotation.VirtualColumn;
 import com.github.nrudenko.orm.commons.DbType;
 import com.github.nrudenko.orm.commons.FieldType;
 
-import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.io.Serializable;
 import java.lang.reflect.Field;
 import java.util.ArrayList;
@@ -118,28 +115,19 @@ public class CursorUtil {
                             field.set(model, cursor.getBlob(columnIndex));
                             break;
                         case SERIALIZED:
-                            final byte[] byteArray = cursor.getBlob(columnIndex);
-                            if (byteArray == null) {
-                                continue;
-                            }
                             if (Serializable.class.isAssignableFrom(field.getType())) {
-                                ByteArrayInputStream bis = new ByteArrayInputStream(byteArray);
-                                ObjectInputStream ois = null;
-                                try {
-                                    ois = new ObjectInputStream(bis);
-                                    Object o = ois.readObject();
-                                    field.set(model, o);
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } catch (ClassNotFoundException e) {
-                                    e.printStackTrace();
-                                } finally {
-                                    try {
-                                        bis.close();
-                                        if (ois != null)
-                                            ois.close();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                                if (field.isAnnotationPresent(DbColumn.class)) {
+                                    Class serializeAdapterClass = field.getAnnotation(DbColumn.class).adapter();
+                                    if (serializeAdapterClass != null) {
+                                        try {
+                                            SerializeAdapter serializeAdapter = (SerializeAdapter) serializeAdapterClass.newInstance();
+                                            Object object = serializeAdapter.deserialize(cursor, columnIndex, modelClass);
+                                            if (object != null) {
+                                                field.set(model, object);
+                                            }
+                                        } catch (InstantiationException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
                             } else {
@@ -243,23 +231,22 @@ public class CursorUtil {
                             break;
                         case SERIALIZED:
                             if (Serializable.class.isAssignableFrom(field.getType())) {
-                                ByteArrayOutputStream bos = new ByteArrayOutputStream();
-                                ObjectOutputStream oos = null;
-                                try {
-                                    oos = new ObjectOutputStream(bos);
-                                    oos.writeObject(value);
-                                    oos.flush();
-                                    bos.close();
-                                    contentValues.put(fieldName, bos.toByteArray());
-                                } catch (IOException e) {
-                                    e.printStackTrace();
-                                } finally {
-                                    try {
-                                        bos.close();
-                                        if (oos != null)
-                                            oos.close();
-                                    } catch (IOException e) {
-                                        e.printStackTrace();
+                                if (field.isAnnotationPresent(DbColumn.class)) {
+                                    Class serializeAdapterClass = field.getAnnotation(DbColumn.class).adapter();
+                                    if (serializeAdapterClass != null) {
+                                        try {
+                                            SerializeAdapter serializeAdapter = (SerializeAdapter) serializeAdapterClass.newInstance();
+                                            Object object = serializeAdapter.serialize(value);
+                                            if (object != null) {
+                                                if (serializeAdapter instanceof BLOBAdapter) {
+                                                    contentValues.put(fieldName, (byte[]) object);
+                                                } else {
+                                                    contentValues.put(fieldName, (String) object);
+                                                }
+                                            }
+                                        } catch (InstantiationException e) {
+                                            e.printStackTrace();
+                                        }
                                     }
                                 }
                             } else {

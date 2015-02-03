@@ -9,7 +9,10 @@ import com.githab.nrudenko.orm.example.R;
 import com.github.nrudenko.orm.CursorUtil;
 import com.github.nrudenko.orm.QueryBuilder;
 import com.github.nrudenko.orm.example.model.Attach;
+import com.github.nrudenko.orm.example.model.Audio;
 import com.github.nrudenko.orm.example.model.ExampleModel;
+import com.github.nrudenko.orm.example.model.Image;
+import com.github.nrudenko.orm.example.model.Message;
 
 import java.util.Date;
 
@@ -31,6 +34,24 @@ public class MainActivity extends ActionBarActivity {
         new QueryBuilder<ExampleModel>(this, SimpleContentProvider.class)
                 .table(ExampleModel.class)
                 .insert(exampleModel);
+
+        Audio audio = new Audio();
+        audio.setDate(new Date());
+        audio.setPath("audio path");
+
+        Image image = new Image();
+        audio.setDate(new Date());
+        audio.setPath("image");
+
+        Message message = new Message();
+        message.setDate(new Date());
+        message.setAudio(audio);
+        message.setImage(image);
+        message.setText("lucky message");
+
+        new QueryBuilder<Message>(this, SimpleContentProvider.class)
+                .table(Message.class)
+                .insert(message);
     }
 
     private void update() {
