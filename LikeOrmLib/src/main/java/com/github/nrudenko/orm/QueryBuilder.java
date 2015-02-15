@@ -8,6 +8,7 @@ import android.database.sqlite.SQLiteQueryBuilder;
 import android.net.Uri;
 import android.text.TextUtils;
 
+import com.github.nrudenko.orm.commons.BaseScheme;
 import com.github.nrudenko.orm.commons.Column;
 import com.github.nrudenko.orm.sql.ASC;
 import com.github.nrudenko.orm.sql.SortOrder;
@@ -24,7 +25,6 @@ public class QueryBuilder<T> {
 
     private final LikeOrmUriHelper.Builder uriBuilder;
     private String table;
-    //    private Uri uri;
     private String[] projection;
     private StringBuilder where = new StringBuilder();
     private ArrayList<String> whereArgs = new ArrayList<String>();
@@ -32,18 +32,21 @@ public class QueryBuilder<T> {
     private String limit;
 
     public QueryBuilder(Context context) {
-        uriBuilder = new LikeOrmUriHelper.Builder(context);
-        this.contentResolver = context.getContentResolver();
+        this(context, new LikeOrmUriHelper.Builder(context));
     }
 
     public QueryBuilder(Context context, Class<? extends ContentProvider> providerClass) {
-        uriBuilder = new LikeOrmUriHelper.Builder(context, providerClass);
+        this(context, new LikeOrmUriHelper.Builder(context, providerClass));
+    }
+
+    private QueryBuilder(Context context, LikeOrmUriHelper.Builder uriBuilder) {
+        this.uriBuilder = uriBuilder;
         this.contentResolver = context.getContentResolver();
     }
 
     public QueryBuilder<T> table(Class<T> aClass, TableJoin... joins) {
         table = aClass.getSimpleName();
-        uriBuilder.addTable(table, joins);
+        uriBuilder.setTable(table, joins);
         return this;
     }
 
@@ -82,8 +85,8 @@ public class QueryBuilder<T> {
 
     public QueryBuilder<T> is(Column column) {
         where
-            .append("=")
-            .append(column.getName());
+                .append("=")
+                .append(column.getName());
         return this;
     }
 
@@ -177,7 +180,7 @@ public class QueryBuilder<T> {
     // insert
     ///////////////////////////////////////////////////////////////////////////
 
-    public Uri insert(T object) {
+    public Uri insert(Object object) {
         return this.contentResolver.insert(getUri(), objectToContentValues(object));
     }
 
@@ -189,8 +192,15 @@ public class QueryBuilder<T> {
         return contentResolver.bulkInsert(getUri(), CursorUtil.listToContentValuesArray(Arrays.asList(objects)));
     }
 
-    public void insert(T object, OnFinishedListener loadFinishedListener) {
-        new QueryLoader(contentResolver, loadFinishedListener).startInsert(0, null, getUri(), objectToContentValues(object));
+    /**
+     * Async insert into database
+     *
+     * @param object
+     * @param insertFinishedListener
+     */
+    public void insert(T object, OnFinishedListener insertFinishedListener) {
+        uriBuilder.setTable(object.getClass().getSimpleName());
+        new QueryLoader(contentResolver, insertFinishedListener).startInsert(0, null, getUri(), objectToContentValues(object));
     }
 
     public void insert(List<T> objects, OnFinishedListener loadFinishedListener) {
@@ -211,7 +221,7 @@ public class QueryBuilder<T> {
 
     public void update(T object, OnFinishedListener loadFinishedListener) {
         new QueryLoader(contentResolver, loadFinishedListener).startUpdate
-            (0, null, getUri(), objectToContentValues(object), getWhere(), getWhereArgs());
+                (0, null, getUri(), objectToContentValues(object), getWhere(), getWhereArgs());
     }
 
     public int delete() {
@@ -220,7 +230,7 @@ public class QueryBuilder<T> {
 
     public void delete(OnFinishedListener loadFinishedListener) {
         new QueryLoader(contentResolver, loadFinishedListener)
-            .startDelete(0, null, getUri(), getWhere(), getWhereArgs());
+                .startDelete(0, null, getUri(), getWhere(), getWhereArgs());
     }
 
     ///////////////////////////////////////////////////////////////////////////
@@ -278,12 +288,12 @@ public class QueryBuilder<T> {
         result.append(orderBy);
 
         if (!TextUtils.isEmpty(limit)) {
-            if (TextUtils.isEmpty(orderBy)) {
-                result.append(new ASC(Scheme._ID).sql); // default is asc by _id
-            }
+//            if (TextUtils.isEmpty(orderBy)) {
+//                result.append(new ASC(BaseScheme._ID).sql); // default is asc by _id
+//            }
             result
-                .append(" ")
-                .append(limit);
+                    .append(" ")
+                    .append(limit);
         }
         return getStringOrNull(result);
     }
@@ -305,16 +315,17 @@ public class QueryBuilder<T> {
             bindedWhere = bindedWhere.replaceFirst("\\?", arg);
         }
         return SQLiteQueryBuilder.buildQueryString(
-            false, table, getProjection(), bindedWhere, null, null, getOrderBy(), null
+                false, table, getProjection(), bindedWhere, null, null, getOrderBy(), null
         );
+
     }
 
     public Column asColumn(Column column) {
         StringBuilder raw = new StringBuilder("(");
         raw
-            .append(toRawQuery())
-            .append(") AS ")
-            .append(column.getName());
+                .append(toRawQuery())
+                .append(") AS ")
+                .append(column.getName());
         return new Column(raw.toString());
     }
 

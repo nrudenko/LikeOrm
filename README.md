@@ -8,10 +8,9 @@ For implementation see LikeOrmExample.
 Main points:
 
 - "database" model should be annotated by @Table
-- extend Database helper from com.github.nrudenko.orm.BaseSQLiteOpenHelper
+- extend Database helper from com.github.nrudenko.orm.LikeOrmDatabaseHelper
 and fill method appendSchemas() with your db entities clases
 
-- install plugin OrmGeneratorPlugin.jar which will
-generate schemas for your db entities
+- install plugin LikeOrm schemes plugin from jetbrains plugin repos
 
 ......

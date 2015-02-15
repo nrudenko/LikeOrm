@@ -4,7 +4,10 @@ import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
 
 import com.github.nrudenko.orm.LikeOrmSQLiteOpenHelper;
-import com.github.nrudenko.orm.example.model.Attach;
+import com.github.nrudenko.orm.commons.BaseScheme;
+import com.github.nrudenko.orm.example.model.ExampleModel;
+import com.github.nrudenko.orm.example.schemas.AttachScheme;
+import com.github.nrudenko.orm.example.schemas.ExampleModelScheme;
 
 import java.util.List;
 
@@ -29,10 +32,9 @@ public class DatabaseHelper extends LikeOrmSQLiteOpenHelper {
     }
 
     @Override
-    protected void appendSchemes(List<Class> classes) {
-//        classes.add(Message.class);
-//        classes.add(ExampleModel.class);
-        classes.add(Attach.class);
+    protected void appendSchemes(List<Class<? extends BaseScheme>> schemes) {
+        schemes.add(AttachScheme.class);
+        schemes.add(ExampleModelScheme.class);
     }
 
     @Override

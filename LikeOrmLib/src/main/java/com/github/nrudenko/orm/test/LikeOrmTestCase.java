@@ -37,7 +37,7 @@ public class LikeOrmTestCase extends AndroidTestCase {
         public PackageInfo getPackageInfo(String packageName, int flags) throws NameNotFoundException {
             PackageInfo packageInfo = mContext.getPackageManager().getPackageInfo(packageName, flags);
             ProviderInfo providerInfo = new ProviderInfo();
-            providerInfo.authority = AUTORITY;
+            providerInfo.authority = getContext().getPackageName();
             providerInfo.name = MockContentProvider.class.getName();
 
             packageInfo.providers = new ProviderInfo[]{providerInfo};
@@ -96,7 +96,7 @@ public class LikeOrmTestCase extends AndroidTestCase {
                     return uri;
                 }
             };
-            mockContentResolver.addProvider(AUTORITY, provider);
+            mockContentResolver.addProvider(getPackageName(), provider);
             return mockContentResolver;
         }
 
@@ -116,6 +116,4 @@ public class LikeOrmTestCase extends AndroidTestCase {
         }
 
     }
-
-    public static final String AUTORITY = "auth";
 }

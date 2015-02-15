@@ -45,7 +45,7 @@ public class QueryCursorLoader extends CursorLoader {
             joinContentObserver = new SimpleNotifyingObserver(context, mainUri);
             List<String> tables = LikeOrmUriHelper.getAllTables(mainUri);
             for (String table : tables) {
-                Uri uri = new LikeOrmUriHelper.Builder(context).addTable(table).build();
+                Uri uri = new LikeOrmUriHelper.Builder(context).setTable(table).build();
                 context.getContentResolver().registerContentObserver(uri, true, joinContentObserver);
             }
         }
@@ -72,7 +72,7 @@ public class QueryCursorLoader extends CursorLoader {
             this.uri = uri;
         }
 
-        @Override
+//        @Override
         public void onChange(boolean selfChange, Uri uri) {
             context.getContentResolver().notifyChange(this.uri, null);
         }

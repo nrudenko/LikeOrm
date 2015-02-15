@@ -11,27 +11,7 @@ public class ExampleModel {
     Date date;
     int intVal;
 
-    public String getText() {
-        return text;
-    }
-
-    public void setText(String text) {
+    public ExampleModel(String text) {
         this.text = text;
-    }
-
-    public Date getDate() {
-        return date;
-    }
-
-    public void setDate(Date date) {
-        this.date = date;
-    }
-
-    public int getIntVal() {
-        return intVal;
-    }
-
-    public void setIntVal(int intVal) {
-        this.intVal = intVal;
     }
 }

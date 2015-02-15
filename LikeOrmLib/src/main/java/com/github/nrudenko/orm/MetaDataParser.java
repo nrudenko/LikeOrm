@@ -10,7 +10,7 @@ import android.os.Bundle;
 
 public class MetaDataParser {
 
-    static <T> T getMetaData(Context context, String name) {
+    public <T> T getMetaData(Context context, String name) {
         try {
             ApplicationInfo info = context.getPackageManager().getApplicationInfo(context.getPackageName(),
                     PackageManager.GET_META_DATA);
@@ -23,7 +23,7 @@ public class MetaDataParser {
         return null;
     }
 
-    static String getAppName(Context context) {
+    public String getAppName(Context context) {
         try {
             PackageManager packageManager = context.getPackageManager();
             ApplicationInfo info = packageManager.getApplicationInfo(context.getPackageName(), 0);
@@ -34,7 +34,7 @@ public class MetaDataParser {
         return "";
     }
 
-    public static String getAuthority(Context context, Class<? extends ContentProvider> providerClass) {
+    public String getAuthority(Context context, Class<? extends ContentProvider> providerClass) {
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
                     PackageManager.GET_PROVIDERS);
@@ -53,7 +53,7 @@ public class MetaDataParser {
         return null;
     }
 
-    public static String getFirstAuthority(Context context) {
+    public String getFirstAuthority(Context context) {
         try {
             PackageInfo packageInfo = context.getPackageManager().getPackageInfo(context.getPackageName(),
                     PackageManager.GET_PROVIDERS);

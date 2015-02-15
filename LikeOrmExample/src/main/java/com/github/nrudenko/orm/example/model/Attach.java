@@ -5,24 +5,14 @@ import com.github.nrudenko.orm.annotation.Table;
 
 @Table
 public class Attach {
-
+    int _id;
     String url;
     @DbColumn(additional = "UNIQUE ON CONFLICT REPLACE")
     String messageId;
 
-    public String getUrl() {
-        return url;
-    }
 
-    public void setUrl(String url) {
+    public Attach(String url, String messageId) {
         this.url = url;
-    }
-
-    public String getMessageId() {
-        return messageId;
-    }
-
-    public void setMessageId(String messageId) {
         this.messageId = messageId;
     }
 }

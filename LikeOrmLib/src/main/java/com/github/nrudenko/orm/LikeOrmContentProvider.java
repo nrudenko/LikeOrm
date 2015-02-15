@@ -24,7 +24,7 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
 
     @Override
     public boolean onCreate() {
-        authority = MetaDataParser.getAuthority(getContext(), getClass());
+        authority = new MetaDataParser().getAuthority(getContext(), getClass());
         uriMatcher = buildUriMatcher();
         return true;
     }
@@ -64,7 +64,7 @@ public abstract class LikeOrmContentProvider extends ContentProvider {
 
     @Override
     public String getType(Uri uri) {
-        //TODO need to implement
+        //TODO getType(uri) should be implemented
         return null;
     }
 
