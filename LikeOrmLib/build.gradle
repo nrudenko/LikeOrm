@@ -18,7 +18,6 @@ android {
 }
 
 dependencies {
-    compile project(':LikeOrmCommons')
     compile 'com.android.support:support-v4:20.+'
     compile 'com.android.support:support-annotations:20.+'
 }

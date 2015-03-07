@@ -1,1 +1,1 @@
-include ':LikeOrmExample', ':LikeOrmLib', ':LikeOrmCommons'
+include ':LikeOrmExample', ':LikeOrmLib'
